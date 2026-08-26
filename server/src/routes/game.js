@@ -43,11 +43,13 @@ router.post('/questions/:id/answer', requireAuth, (req, res) => {
     coinsAwarded = 0;
     xpAwarded = Math.max(1, Math.round(xpAwarded * 0.2));
   }
+  const ticketsAwarded = 1;
 
   db.prepare("UPDATE progress SET solved = 1, solved_at = datetime('now') WHERE id = ?").run(prog.id);
-  db.prepare('UPDATE users SET coins = coins + ?, xp = xp + ? WHERE id = ?').run(
+  db.prepare('UPDATE users SET coins = coins + ?, xp = xp + ?, roulette_tickets = roulette_tickets + ? WHERE id = ?').run(
     coinsAwarded,
     xpAwarded,
+    ticketsAwarded,
     req.user.id
   );
 
@@ -56,6 +58,7 @@ router.post('/questions/:id/answer', requireAuth, (req, res) => {
     correct: true,
     coinsAwarded,
     xpAwarded,
+    ticketsAwarded,
     answer: question.answer,
     user: serializeUser(updatedUser),
   });

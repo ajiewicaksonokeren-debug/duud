@@ -7,3 +7,5 @@ build/
 *.sqlite-shm
 .env
 .DS_Store
+server/src/data/uploads/*
+!server/src/data/uploads/.gitkeep

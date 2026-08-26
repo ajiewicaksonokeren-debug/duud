@@ -12,6 +12,7 @@ export function serializeUser(user) {
     xpFloor: prog.floor,
     xpCeiling: prog.ceiling,
     xpProgress: prog.progress,
+    rouletteTickets: user.roulette_tickets,
     avatar: user.avatar,
     lastDailyClaim: user.last_daily_claim,
   };
@@ -20,8 +21,8 @@ export function serializeUser(user) {
 export function serializeQuestion(q, { includeAnswer = false } = {}) {
   return {
     id: q.id,
-    packId: q.pack_id,
-    orderIndex: q.order_index,
+    categoryId: q.category_id,
+    levelNumber: q.level_number,
     clues: JSON.parse(q.clues_json),
     difficulty: q.difficulty,
     rewardCoins: q.reward_coins,
@@ -31,12 +32,40 @@ export function serializeQuestion(q, { includeAnswer = false } = {}) {
   };
 }
 
-export function serializePack(p) {
+export function serializeCategory(c) {
+  return {
+    id: c.id,
+    orderIndex: c.order_index,
+    name: c.name,
+    icon: c.icon,
+    description: c.description,
+    unlockPlayerLevel: c.unlock_player_level,
+  };
+}
+
+export function serializePrize(p, { includeWeight = false } = {}) {
   return {
     id: p.id,
-    orderIndex: p.order_index,
     name: p.name,
-    category: p.category,
-    unlockPlayerLevel: p.unlock_player_level,
+    icon: p.icon,
+    type: p.type,
+    amount: p.amount,
+    requiresClaim: !!p.requires_claim,
+    active: !!p.active,
+    ...(includeWeight ? { weight: p.weight } : {}),
+  };
+}
+
+export function serializeClaim(c) {
+  return {
+    id: c.id,
+    prizeName: c.prize_name,
+    prizeType: c.prize_type,
+    prizeAmount: c.prize_amount,
+    status: c.status,
+    createdAt: c.created_at,
+    expiresAt: c.expires_at,
+    claimedAt: c.claimed_at,
+    formData: c.form_data_json ? JSON.parse(c.form_data_json) : null,
   };
 }

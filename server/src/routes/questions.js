@@ -15,22 +15,29 @@ function validateClues(clues) {
   );
 }
 
-// Admin: create a question directly inside a pack.
+function nextLevelNumber(categoryId) {
+  const row = db
+    .prepare('SELECT MAX(level_number) AS maxLevel FROM questions WHERE category_id = ?')
+    .get(categoryId);
+  return (row?.maxLevel || 0) + 1;
+}
+
+// Admin: create a question directly inside a category (auto-assigned next level number).
 router.post('/', requireAuth, requireAdmin, (req, res) => {
-  const { packId, clues, answer, difficulty, rewardCoins, rewardXp, orderIndex } = req.body || {};
-  const pack = db.prepare('SELECT * FROM packs WHERE id = ?').get(packId);
-  if (!pack) return res.status(400).json({ error: 'Pack tidak valid.' });
+  const { categoryId, clues, answer, difficulty, rewardCoins, rewardXp, levelNumber } = req.body || {};
+  const category = db.prepare('SELECT * FROM categories WHERE id = ?').get(categoryId);
+  if (!category) return res.status(400).json({ error: 'Kategori tidak valid.' });
   if (!validateClues(clues)) return res.status(400).json({ error: 'Clue tidak valid.' });
   if (!answer || !answer.trim()) return res.status(400).json({ error: 'Jawaban wajib diisi.' });
 
   const info = db
     .prepare(
-      `INSERT INTO questions (pack_id, order_index, clues_json, answer, difficulty, reward_coins, reward_xp, created_by)
+      `INSERT INTO questions (category_id, level_number, clues_json, answer, difficulty, reward_coins, reward_xp, created_by)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .run(
-      pack.id,
-      orderIndex ?? 0,
+      category.id,
+      levelNumber ?? nextLevelNumber(category.id),
       JSON.stringify(clues),
       answer.trim().toUpperCase(),
       difficulty ?? 1,
@@ -43,19 +50,57 @@ router.post('/', requireAuth, requireAdmin, (req, res) => {
   res.status(201).json({ question: serializeQuestion(question, { includeAnswer: true }) });
 });
 
+// Admin: bulk import many questions into one category at once (JSON array).
+router.post('/bulk', requireAuth, requireAdmin, (req, res) => {
+  const { categoryId, questions } = req.body || {};
+  const category = db.prepare('SELECT * FROM categories WHERE id = ?').get(categoryId);
+  if (!category) return res.status(400).json({ error: 'Kategori tidak valid.' });
+  if (!Array.isArray(questions) || questions.length === 0) {
+    return res.status(400).json({ error: 'Daftar soal kosong.' });
+  }
+  for (const q of questions) {
+    if (!validateClues(q.clues) || !q.answer || !String(q.answer).trim()) {
+      return res.status(400).json({ error: 'Ada soal dengan clue/jawaban tidak valid.' });
+    }
+  }
+
+  let level = nextLevelNumber(category.id);
+  const insert = db.prepare(
+    `INSERT INTO questions (category_id, level_number, clues_json, answer, difficulty, reward_coins, reward_xp, created_by)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+  );
+  const insertMany = db.transaction((items) => {
+    for (const q of items) {
+      insert.run(
+        category.id,
+        level++,
+        JSON.stringify(q.clues),
+        String(q.answer).trim().toUpperCase(),
+        q.difficulty ?? 1,
+        q.rewardCoins ?? 10,
+        q.rewardXp ?? 10,
+        req.user.id
+      );
+    }
+  });
+  insertMany(questions);
+
+  res.status(201).json({ ok: true, inserted: questions.length });
+});
+
 router.put('/:id', requireAuth, requireAdmin, (req, res) => {
   const question = db.prepare('SELECT * FROM questions WHERE id = ?').get(req.params.id);
   if (!question) return res.status(404).json({ error: 'Soal tidak ditemukan.' });
 
-  const { clues, answer, difficulty, rewardCoins, rewardXp, orderIndex, packId } = req.body || {};
+  const { clues, answer, difficulty, rewardCoins, rewardXp, levelNumber, categoryId } = req.body || {};
   if (clues && !validateClues(clues)) return res.status(400).json({ error: 'Clue tidak valid.' });
 
   db.prepare(
-    `UPDATE questions SET pack_id = ?, order_index = ?, clues_json = ?, answer = ?, difficulty = ?, reward_coins = ?, reward_xp = ?
+    `UPDATE questions SET category_id = ?, level_number = ?, clues_json = ?, answer = ?, difficulty = ?, reward_coins = ?, reward_xp = ?
      WHERE id = ?`
   ).run(
-    packId ?? question.pack_id,
-    orderIndex ?? question.order_index,
+    categoryId ?? question.category_id,
+    levelNumber ?? question.level_number,
     clues ? JSON.stringify(clues) : question.clues_json,
     answer ? answer.trim().toUpperCase() : question.answer,
     difficulty ?? question.difficulty,
@@ -73,9 +118,11 @@ router.delete('/:id', requireAuth, requireAdmin, (req, res) => {
   res.json({ ok: true });
 });
 
-// Admin view: list all questions across all packs with answers visible.
+// Admin view: list all questions across all categories with answers visible.
 router.get('/', requireAuth, requireAdmin, (req, res) => {
-  const questions = db.prepare('SELECT * FROM questions ORDER BY pack_id ASC, order_index ASC').all();
+  const questions = db
+    .prepare('SELECT * FROM questions ORDER BY category_id ASC, level_number ASC')
+    .all();
   res.json({ questions: questions.map((q) => serializeQuestion(q, { includeAnswer: true })) });
 });
 
@@ -94,7 +141,9 @@ router.post('/submit', requireAuth, (req, res) => {
 
 router.get('/submitted', requireAuth, requireAdmin, (req, res) => {
   const rows = db
-    .prepare('SELECT sq.*, u.username FROM submitted_questions sq JOIN users u ON u.id = sq.user_id ORDER BY sq.created_at DESC')
+    .prepare(
+      'SELECT sq.*, u.username FROM submitted_questions sq JOIN users u ON u.id = sq.user_id ORDER BY sq.created_at DESC'
+    )
     .all();
   res.json({
     submitted: rows.map((r) => ({
@@ -108,19 +157,19 @@ router.get('/submitted', requireAuth, requireAdmin, (req, res) => {
   });
 });
 
-// Approve a submitted question into a pack, or reject it.
+// Approve a submitted question into a category, or reject it.
 router.post('/submitted/:id/review', requireAuth, requireAdmin, (req, res) => {
   const submitted = db.prepare('SELECT * FROM submitted_questions WHERE id = ?').get(req.params.id);
   if (!submitted) return res.status(404).json({ error: 'Tidak ditemukan.' });
-  const { action, packId } = req.body || {};
+  const { action, categoryId } = req.body || {};
 
   if (action === 'approve') {
-    const pack = db.prepare('SELECT * FROM packs WHERE id = ?').get(packId);
-    if (!pack) return res.status(400).json({ error: 'Pack tujuan tidak valid.' });
+    const category = db.prepare('SELECT * FROM categories WHERE id = ?').get(categoryId);
+    if (!category) return res.status(400).json({ error: 'Kategori tujuan tidak valid.' });
     db.prepare(
-      `INSERT INTO questions (pack_id, order_index, clues_json, answer, difficulty, reward_coins, reward_xp, created_by)
-       VALUES (?, 0, ?, ?, 1, 15, 15, ?)`
-    ).run(pack.id, submitted.clues_json, submitted.answer, submitted.user_id);
+      `INSERT INTO questions (category_id, level_number, clues_json, answer, difficulty, reward_coins, reward_xp, created_by)
+       VALUES (?, ?, ?, ?, 1, 15, 15, ?)`
+    ).run(category.id, nextLevelNumber(category.id), submitted.clues_json, submitted.answer, submitted.user_id);
     db.prepare("UPDATE submitted_questions SET status = 'approved' WHERE id = ?").run(submitted.id);
     db.prepare('UPDATE users SET coins = coins + 25 WHERE id = ?').run(submitted.user_id);
   } else {

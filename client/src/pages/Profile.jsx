@@ -1,18 +1,24 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../api.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../hooks/useToast.js';
 import Toast from '../components/Toast.jsx';
+import { openExternal } from '../utils/openExternal.js';
+
+const CLAIM_STATUS_LABEL = { pending: 'Menunggu diklaim', claimed: 'Sudah diklaim', expired: 'Kedaluwarsa' };
 
 export default function Profile() {
   const { user, logout, refreshMe } = useAuth();
   const { toast, showToast } = useToast();
   const [daily, setDaily] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
+  const [claims, setClaims] = useState([]);
 
   useEffect(() => {
     api.get('/rewards/daily/status').then(({ data }) => setDaily(data));
     api.get('/rewards/leaderboard').then(({ data }) => setLeaderboard(data.leaderboard));
+    api.get('/roulette/history').then(({ data }) => setClaims(data.claims));
   }, []);
 
   async function claimDaily() {
@@ -67,6 +73,27 @@ export default function Profile() {
         </button>
       </div>
 
+      {claims.length > 0 && (
+        <>
+          <div className="section-title">Riwayat Hadiah Roulette</div>
+          {claims.map((c) => (
+            <div key={c.id} className="card" style={{ marginBottom: 8 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <div style={{ fontWeight: 700 }}>{c.prizeName}</div>
+                  <div style={{ fontSize: 11, color: '#5b7a78' }}>{CLAIM_STATUS_LABEL[c.status] || c.status}</div>
+                </div>
+                {c.status === 'pending' && (
+                  <button className="btn warn" style={{ padding: '8px 12px', fontSize: 12 }} onClick={() => openExternal(c.claimUrl)}>
+                    Klaim di esportsku.com
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </>
+      )}
+
       <div className="section-title">Papan Peringkat</div>
       <div>
         {leaderboard.map((row, i) => (
@@ -79,7 +106,16 @@ export default function Profile() {
         ))}
       </div>
 
-      <button className="btn secondary block" style={{ marginTop: 16 }} onClick={logout}>
+      {user?.isAdmin && (
+        <>
+          <div className="section-title">Menu Lainnya</div>
+          <Link to="/admin" className="btn secondary block" style={{ display: 'block', textAlign: 'center', textDecoration: 'none', marginBottom: 8 }}>
+            🛠️ Panel Admin
+          </Link>
+        </>
+      )}
+
+      <button className="btn secondary block" style={{ marginTop: 8 }} onClick={logout}>
         Keluar
       </button>
     </div>

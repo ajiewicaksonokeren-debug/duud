@@ -8,8 +8,9 @@ export default function Layout() {
     <div className="app-shell">
       <div className="topbar">
         <h1>🖼️ Tebak Gambar</h1>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           <span className="stat-pill">🪙 {user?.coins ?? 0}</span>
+          <span className="stat-pill">🎟️ {user?.rouletteTickets ?? 0}</span>
           <span className="stat-pill">⭐ Lv.{user?.playerLevel ?? 1}</span>
         </div>
       </div>
@@ -21,6 +22,10 @@ export default function Layout() {
           <span className="icon">🏠</span>
           Main
         </NavLink>
+        <NavLink to="/roulette" className={({ isActive }) => (isActive ? 'active' : '')}>
+          <span className="icon">🎰</span>
+          Roulette
+        </NavLink>
         <NavLink to="/multiplayer" className={({ isActive }) => (isActive ? 'active' : '')}>
           <span className="icon">🎮</span>
           Multiplayer
@@ -29,12 +34,6 @@ export default function Layout() {
           <span className="icon">📝</span>
           Kirim Soal
         </NavLink>
-        {user?.isAdmin && (
-          <NavLink to="/admin" className={({ isActive }) => (isActive ? 'active' : '')}>
-            <span className="icon">🛠️</span>
-            Admin
-          </NavLink>
-        )}
         <NavLink to="/profile" className={({ isActive }) => (isActive ? 'active' : '')}>
           <span className="icon">👤</span>
           User

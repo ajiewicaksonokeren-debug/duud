@@ -9,19 +9,19 @@ export default function MultiplayerLobby() {
   const { socket, connected } = useSocket();
   const navigate = useNavigate();
   const { toast, showToast } = useToast();
-  const [packs, setPacks] = useState([]);
-  const [packId, setPackId] = useState('');
+  const [categories, setCategories] = useState([]);
+  const [categoryId, setCategoryId] = useState('');
   const [joinCode, setJoinCode] = useState('');
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    api.get('/packs').then(({ data }) => setPacks(data.packs.filter((p) => !p.locked)));
+    api.get('/categories').then(({ data }) => setCategories(data.categories.filter((c) => !c.locked)));
   }, []);
 
   function createRoom() {
     if (!socket) return showToast('Menghubungkan ke server...', 'error');
     setBusy(true);
-    socket.emit('room:create', { packId: packId || null }, (res) => {
+    socket.emit('room:create', { categoryId: categoryId || null }, (res) => {
       setBusy(false);
       if (res?.ok) {
         navigate(`/multiplayer/${res.room.code}`);
@@ -54,12 +54,12 @@ export default function MultiplayerLobby() {
       <div className="card">
         <h3 style={{ marginTop: 0 }}>🎮 Buat Room Baru</h3>
         <div className="field">
-          <label>Pilih Pack (kosongkan untuk acak)</label>
-          <select value={packId} onChange={(e) => setPackId(e.target.value)}>
-            <option value="">Acak dari semua pack</option>
-            {packs.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
+          <label>Pilih Kategori (kosongkan untuk acak)</label>
+          <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
+            <option value="">Acak dari semua kategori</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.icon} {c.name}
               </option>
             ))}
           </select>

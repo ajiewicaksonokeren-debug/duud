@@ -4,12 +4,16 @@ import cors from 'cors';
 import http from 'node:http';
 import { Server } from 'socket.io';
 
+import { uploadsDir } from './db.js';
 import './data/seed.js';
 import authRoutes from './routes/auth.js';
-import packRoutes from './routes/packs.js';
+import categoryRoutes from './routes/categories.js';
 import questionRoutes from './routes/questions.js';
 import gameRoutes from './routes/game.js';
 import rewardRoutes from './routes/rewards.js';
+import rouletteRoutes from './routes/roulette.js';
+import publicClaimRoutes from './routes/publicClaims.js';
+import uploadRoutes from './routes/uploads.js';
 import { registerMultiplayer } from './socket/multiplayer.js';
 
 const app = express();
@@ -18,13 +22,17 @@ const io = new Server(server, { cors: { origin: '*' } });
 
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(uploadsDir));
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 app.use('/api/auth', authRoutes);
-app.use('/api/packs', packRoutes);
+app.use('/api/categories', categoryRoutes);
 app.use('/api/questions', questionRoutes);
 app.use('/api/game', gameRoutes);
 app.use('/api/rewards', rewardRoutes);
+app.use('/api/roulette', rouletteRoutes);
+app.use('/api/public/claims', publicClaimRoutes);
+app.use('/api/uploads', uploadRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err);

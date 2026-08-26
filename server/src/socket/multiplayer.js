@@ -18,9 +18,9 @@ function makeRoomCode() {
   return code;
 }
 
-function pickQuestions(packId, count) {
-  const pool = packId
-    ? db.prepare('SELECT * FROM questions WHERE pack_id = ?').all(packId)
+function pickQuestions(categoryId, count) {
+  const pool = categoryId
+    ? db.prepare('SELECT * FROM questions WHERE category_id = ?').all(categoryId)
     : db.prepare('SELECT * FROM questions').all();
   const shuffled = [...pool].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, Math.min(count, shuffled.length));
@@ -31,7 +31,7 @@ function publicRoomState(room) {
     code: room.code,
     hostId: room.hostId,
     status: room.status,
-    packId: room.packId,
+    categoryId: room.categoryId,
     totalRounds: room.questions.length,
     currentRound: room.currentIndex + 1,
     players: [...room.players.values()].map((p) => ({
@@ -79,9 +79,13 @@ function endMatch(io, room) {
     players.forEach((p, idx) => {
       const coins = idx === 0 ? 100 : Math.max(10, 40 - idx * 10);
       const xp = idx === 0 ? 60 : Math.max(5, 25 - idx * 5);
-      db.prepare('UPDATE users SET coins = coins + ?, xp = xp + ? WHERE id = ?').run(coins, xp, p.userId);
+      const tickets = idx === 0 ? 2 : 1;
+      db.prepare(
+        'UPDATE users SET coins = coins + ?, xp = xp + ?, roulette_tickets = roulette_tickets + ? WHERE id = ?'
+      ).run(coins, xp, tickets, p.userId);
       p.coinsAwarded = coins;
       p.xpAwarded = xp;
+      p.ticketsAwarded = tickets;
     });
     db.prepare('INSERT INTO match_history (room_code, players_json, winner_username) VALUES (?, ?, ?)').run(
       room.code,
@@ -99,6 +103,7 @@ function endMatch(io, room) {
       score: p.score,
       coinsAwarded: p.coinsAwarded,
       xpAwarded: p.xpAwarded,
+      ticketsAwarded: p.ticketsAwarded,
     })),
     winner: winner ? { username: winner.username, score: winner.score } : null,
   });
@@ -138,9 +143,9 @@ function finishRound(io, room) {
 function startMatch(io, room) {
   room.status = 'playing';
   room.currentIndex = -1;
-  room.questions = pickQuestions(room.packId, ROUNDS_PER_MATCH);
+  room.questions = pickQuestions(room.categoryId, ROUNDS_PER_MATCH);
   if (room.questions.length === 0) {
-    io.to(room.code).emit('room:error', { message: 'Tidak ada soal tersedia untuk pack ini.' });
+    io.to(room.code).emit('room:error', { message: 'Tidak ada soal tersedia untuk kategori ini.' });
     room.status = 'waiting';
     return;
   }
@@ -165,13 +170,13 @@ export function registerMultiplayer(io) {
   io.on('connection', (socket) => {
     const user = socket.user;
 
-    socket.on('room:create', ({ packId } = {}, ack) => {
+    socket.on('room:create', ({ categoryId } = {}, ack) => {
       const code = makeRoomCode();
       const room = {
         code,
         hostId: user.id,
         status: 'waiting',
-        packId: packId || null,
+        categoryId: categoryId || null,
         questions: [],
         currentIndex: -1,
         players: new Map(),

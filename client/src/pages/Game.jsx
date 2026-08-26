@@ -7,12 +7,12 @@ import Toast from '../components/Toast.jsx';
 import QuestionCard from '../components/QuestionCard.jsx';
 
 export default function Game() {
-  const { packId } = useParams();
+  const { categoryId } = useParams();
   const navigate = useNavigate();
   const { refreshMe } = useAuth();
   const { toast, showToast } = useToast();
 
-  const [pack, setPack] = useState(null);
+  const [category, setCategory] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [index, setIndex] = useState(0);
   const [guess, setGuess] = useState('');
@@ -20,11 +20,11 @@ export default function Game() {
   const [loading, setLoading] = useState(true);
   const [checking, setChecking] = useState(false);
 
-  const loadPack = useCallback(async () => {
+  const loadCategory = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await api.get(`/packs/${packId}/questions`);
-      setPack(data.pack);
+      const { data } = await api.get(`/categories/${categoryId}/questions`);
+      setCategory(data.category);
       setQuestions(data.questions);
       const firstUnsolved = data.questions.findIndex((q) => !q.solved);
       setIndex(firstUnsolved === -1 ? 0 : firstUnsolved);
@@ -35,11 +35,11 @@ export default function Game() {
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [packId]);
+  }, [categoryId]);
 
   useEffect(() => {
-    loadPack();
-  }, [loadPack]);
+    loadCategory();
+  }, [loadCategory]);
 
   const current = questions[index];
 
@@ -57,7 +57,10 @@ export default function Game() {
     try {
       const { data } = await api.post(`/game/questions/${current.id}/answer`, { answer: guess });
       if (data.correct) {
-        showToast(`Benar! +${data.coinsAwarded ?? 0} koin, +${data.xpAwarded ?? 0} xp`, 'success');
+        showToast(
+          `Benar! +${data.coinsAwarded ?? 0} koin, +${data.xpAwarded ?? 0} xp, +${data.ticketsAwarded ?? 0} 🎟️`,
+          'success'
+        );
         await refreshMe();
         setQuestions((qs) => qs.map((q, i) => (i === index ? { ...q, solved: true, answer: current.answer || data.answer } : q)));
         setTimeout(() => {
@@ -97,14 +100,14 @@ export default function Game() {
   }, [masked, current]);
 
   if (loading) return <div className="empty-state">Memuat soal...</div>;
-  if (!current) return <div className="empty-state">Belum ada soal di level ini.</div>;
+  if (!current) return <div className="empty-state">Belum ada soal di kategori ini.</div>;
 
   if (allSolved) {
     return (
       <div className="card" style={{ textAlign: 'center' }}>
         <div style={{ fontSize: 48 }}>🎉</div>
-        <h2>Level Selesai!</h2>
-        <p>Kamu berhasil menyelesaikan semua soal di {pack?.name}.</p>
+        <h2>Kategori Selesai!</h2>
+        <p>Kamu berhasil menyelesaikan semua level di {category?.name}.</p>
         <button className="btn block" onClick={() => navigate('/')}>
           Kembali ke Beranda
         </button>
@@ -116,9 +119,11 @@ export default function Game() {
     <div>
       <Toast toast={toast} />
       <div className="tabs">
-        <button className="active">{pack?.name}</button>
+        <button className="active">
+          {category?.icon} {category?.name}
+        </button>
         <span style={{ display: 'flex', alignItems: 'center', padding: '0 8px', fontSize: 12, color: 'var(--text-dim)' }}>
-          {index + 1}/{questions.length}
+          Level {current.levelNumber}/{questions.length}
         </span>
       </div>
 

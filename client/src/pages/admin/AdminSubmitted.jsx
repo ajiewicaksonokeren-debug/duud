@@ -4,20 +4,20 @@ import QuestionCard from '../../components/QuestionCard.jsx';
 
 export default function AdminSubmitted({ showToast }) {
   const [submitted, setSubmitted] = useState([]);
-  const [packs, setPacks] = useState([]);
-  const [targetPack, setTargetPack] = useState({});
+  const [categories, setCategories] = useState([]);
+  const [targetCategory, setTargetCategory] = useState({});
 
   async function load() {
-    const [{ data: subData }, { data: packData }] = await Promise.all([
+    const [{ data: subData }, { data: categoryData }] = await Promise.all([
       api.get('/questions/submitted'),
-      api.get('/packs'),
+      api.get('/categories'),
     ]);
     setSubmitted(subData.submitted);
-    setPacks(packData.packs);
-    setTargetPack((tp) => {
-      const next = { ...tp };
+    setCategories(categoryData.categories);
+    setTargetCategory((tc) => {
+      const next = { ...tc };
       subData.submitted.forEach((s) => {
-        if (!next[s.id]) next[s.id] = packData.packs[0]?.id;
+        if (!next[s.id]) next[s.id] = categoryData.categories[0]?.id;
       });
       return next;
     });
@@ -29,7 +29,7 @@ export default function AdminSubmitted({ showToast }) {
 
   async function review(id, action) {
     try {
-      await api.post(`/questions/submitted/${id}/review`, { action, packId: targetPack[id] });
+      await api.post(`/questions/submitted/${id}/review`, { action, categoryId: targetCategory[id] });
       showToast(action === 'approve' ? 'Soal disetujui & ditambahkan.' : 'Soal ditolak.', 'success');
       load();
     } catch (err) {
@@ -51,11 +51,14 @@ export default function AdminSubmitted({ showToast }) {
           </div>
           <div style={{ fontWeight: 700, margin: '8px 0' }}>Jawaban: {s.answer}</div>
           <div className="field">
-            <label>Masukkan ke pack</label>
-            <select value={targetPack[s.id]} onChange={(e) => setTargetPack({ ...targetPack, [s.id]: Number(e.target.value) })}>
-              {packs.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
+            <label>Masukkan ke kategori</label>
+            <select
+              value={targetCategory[s.id]}
+              onChange={(e) => setTargetCategory({ ...targetCategory, [s.id]: Number(e.target.value) })}
+            >
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.icon} {c.name}
                 </option>
               ))}
             </select>

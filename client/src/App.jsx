@@ -6,6 +6,8 @@ import Home from './pages/Home.jsx';
 import Game from './pages/Game.jsx';
 import Profile from './pages/Profile.jsx';
 import SubmitQuestion from './pages/SubmitQuestion.jsx';
+import Roulette from './pages/Roulette.jsx';
+import ClaimPublic from './pages/ClaimPublic.jsx';
 import Admin from './pages/admin/Admin.jsx';
 import MultiplayerLobby from './pages/multiplayer/MultiplayerLobby.jsx';
 import MultiplayerRoom from './pages/multiplayer/MultiplayerRoom.jsx';
@@ -27,6 +29,8 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      {/* Public claim page opened via in-app browser (Custom Tabs), no login required. */}
+      <Route path="/rewards/id/:token" element={<ClaimPublic />} />
       <Route
         path="/"
         element={
@@ -36,7 +40,8 @@ export default function App() {
         }
       >
         <Route index element={<Home />} />
-        <Route path="pack/:packId" element={<Game />} />
+        <Route path="category/:categoryId" element={<Game />} />
+        <Route path="roulette" element={<Roulette />} />
         <Route path="multiplayer" element={<MultiplayerLobby />} />
         <Route path="multiplayer/:code" element={<MultiplayerRoom />} />
         <Route path="kirim-soal" element={<SubmitQuestion />} />

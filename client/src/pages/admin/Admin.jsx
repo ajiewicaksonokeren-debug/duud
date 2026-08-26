@@ -1,33 +1,44 @@
 import { useState } from 'react';
-import AdminPacks from './AdminPacks.jsx';
+import AdminCategories from './AdminCategories.jsx';
 import AdminQuestions from './AdminQuestions.jsx';
+import AdminBulkImport from './AdminBulkImport.jsx';
 import AdminSubmitted from './AdminSubmitted.jsx';
+import AdminRoulette from './AdminRoulette.jsx';
+import AdminClaims from './AdminClaims.jsx';
 import Toast from '../../components/Toast.jsx';
 import { useToast } from '../../hooks/useToast.js';
 
+const TABS = [
+  { key: 'categories', label: 'Kategori' },
+  { key: 'questions', label: 'Soal' },
+  { key: 'bulk', label: 'Import Massal' },
+  { key: 'submitted', label: 'Kiriman User' },
+  { key: 'roulette', label: 'Roulette' },
+  { key: 'claims', label: 'Klaim Hadiah' },
+];
+
 export default function Admin() {
-  const [tab, setTab] = useState('packs');
+  const [tab, setTab] = useState('categories');
   const { toast, showToast } = useToast();
 
   return (
     <div>
       <Toast toast={toast} />
       <div className="section-title">Panel Admin</div>
-      <div className="tabs">
-        <button className={tab === 'packs' ? 'active' : ''} onClick={() => setTab('packs')}>
-          Level/Pack
-        </button>
-        <button className={tab === 'questions' ? 'active' : ''} onClick={() => setTab('questions')}>
-          Soal
-        </button>
-        <button className={tab === 'submitted' ? 'active' : ''} onClick={() => setTab('submitted')}>
-          Kiriman User
-        </button>
+      <div className="tabs" style={{ flexWrap: 'wrap' }}>
+        {TABS.map((t) => (
+          <button key={t.key} className={tab === t.key ? 'active' : ''} onClick={() => setTab(t.key)} style={{ flex: '1 1 30%' }}>
+            {t.label}
+          </button>
+        ))}
       </div>
 
-      {tab === 'packs' && <AdminPacks showToast={showToast} />}
+      {tab === 'categories' && <AdminCategories showToast={showToast} />}
       {tab === 'questions' && <AdminQuestions showToast={showToast} />}
+      {tab === 'bulk' && <AdminBulkImport showToast={showToast} />}
       {tab === 'submitted' && <AdminSubmitted showToast={showToast} />}
+      {tab === 'roulette' && <AdminRoulette showToast={showToast} />}
+      {tab === 'claims' && <AdminClaims />}
     </div>
   );
 }
