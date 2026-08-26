@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext.jsx';
+import { API_BASE } from '../api.js';
 
 const SocketContext = createContext(null);
 
@@ -17,7 +18,7 @@ export function SocketProvider({ children }) {
       return;
     }
 
-    const socket = io('/', { auth: { token }, transports: ['websocket', 'polling'] });
+    const socket = io(API_BASE || '/', { auth: { token }, transports: ['websocket', 'polling'] });
     socketRef.current = socket;
 
     socket.on('connect', () => setConnected(true));

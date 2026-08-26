@@ -1,0 +1,8 @@
+{
+  "appId": "com.tebakgambar.app",
+  "appName": "Tebak Gambar",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}

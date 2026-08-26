@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: tebak-gambar-server
+    runtime: docker
+    dockerfilePath: ./server/Dockerfile
+    dockerContext: ./server
+    plan: free
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DB_PATH
+        value: /app/data/tebak-gambar.sqlite
+    disk:
+      name: tebak-gambar-data
+      mountPath: /app/data
+      sizeGB: 1
