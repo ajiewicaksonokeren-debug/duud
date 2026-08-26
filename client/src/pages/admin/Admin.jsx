@@ -5,6 +5,8 @@ import AdminBulkImport from './AdminBulkImport.jsx';
 import AdminSubmitted from './AdminSubmitted.jsx';
 import AdminRoulette from './AdminRoulette.jsx';
 import AdminClaims from './AdminClaims.jsx';
+import AdminArticles from './AdminArticles.jsx';
+import AdminEsports from './AdminEsports.jsx';
 import Toast from '../../components/Toast.jsx';
 import { useToast } from '../../hooks/useToast.js';
 
@@ -13,6 +15,8 @@ const TABS = [
   { key: 'questions', label: 'Soal' },
   { key: 'bulk', label: 'Import Massal' },
   { key: 'submitted', label: 'Kiriman User' },
+  { key: 'articles', label: 'Artikel' },
+  { key: 'esports', label: 'Tebak Skor' },
   { key: 'roulette', label: 'Roulette' },
   { key: 'claims', label: 'Klaim Hadiah' },
 ];
@@ -37,6 +41,8 @@ export default function Admin() {
       {tab === 'questions' && <AdminQuestions showToast={showToast} />}
       {tab === 'bulk' && <AdminBulkImport showToast={showToast} />}
       {tab === 'submitted' && <AdminSubmitted showToast={showToast} />}
+      {tab === 'articles' && <AdminArticles showToast={showToast} />}
+      {tab === 'esports' && <AdminEsports showToast={showToast} />}
       {tab === 'roulette' && <AdminRoulette showToast={showToast} />}
       {tab === 'claims' && <AdminClaims />}
     </div>

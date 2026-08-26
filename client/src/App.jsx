@@ -7,6 +7,9 @@ import Game from './pages/Game.jsx';
 import Profile from './pages/Profile.jsx';
 import SubmitQuestion from './pages/SubmitQuestion.jsx';
 import Roulette from './pages/Roulette.jsx';
+import Articles from './pages/Articles.jsx';
+import ArticleDetail from './pages/ArticleDetail.jsx';
+import TebakSkor from './pages/TebakSkor.jsx';
 import ClaimPublic from './pages/ClaimPublic.jsx';
 import Admin from './pages/admin/Admin.jsx';
 import MultiplayerLobby from './pages/multiplayer/MultiplayerLobby.jsx';
@@ -42,6 +45,9 @@ export default function App() {
         <Route index element={<Home />} />
         <Route path="category/:categoryId" element={<Game />} />
         <Route path="roulette" element={<Roulette />} />
+        <Route path="artikel" element={<Articles />} />
+        <Route path="artikel/:id" element={<ArticleDetail />} />
+        <Route path="tebak-skor" element={<TebakSkor />} />
         <Route path="multiplayer" element={<MultiplayerLobby />} />
         <Route path="multiplayer/:code" element={<MultiplayerRoom />} />
         <Route path="kirim-soal" element={<SubmitQuestion />} />

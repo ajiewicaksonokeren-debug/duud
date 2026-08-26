@@ -22,17 +22,17 @@ export default function Layout() {
           <span className="icon">🏠</span>
           Main
         </NavLink>
+        <NavLink to="/artikel" className={({ isActive }) => (isActive ? 'active' : '')}>
+          <span className="icon">📰</span>
+          Artikel
+        </NavLink>
+        <NavLink to="/tebak-skor" className={({ isActive }) => (isActive ? 'active' : '')}>
+          <span className="icon">🔮</span>
+          Tebak Skor
+        </NavLink>
         <NavLink to="/roulette" className={({ isActive }) => (isActive ? 'active' : '')}>
           <span className="icon">🎰</span>
           Roulette
-        </NavLink>
-        <NavLink to="/multiplayer" className={({ isActive }) => (isActive ? 'active' : '')}>
-          <span className="icon">🎮</span>
-          Multiplayer
-        </NavLink>
-        <NavLink to="/kirim-soal" className={({ isActive }) => (isActive ? 'active' : '')}>
-          <span className="icon">📝</span>
-          Kirim Soal
         </NavLink>
         <NavLink to="/profile" className={({ isActive }) => (isActive ? 'active' : '')}>
           <span className="icon">👤</span>

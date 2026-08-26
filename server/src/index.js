@@ -14,6 +14,8 @@ import rewardRoutes from './routes/rewards.js';
 import rouletteRoutes from './routes/roulette.js';
 import publicClaimRoutes from './routes/publicClaims.js';
 import uploadRoutes from './routes/uploads.js';
+import articleRoutes from './routes/articles.js';
+import esportsRoutes from './routes/esports.js';
 import { registerMultiplayer } from './socket/multiplayer.js';
 
 const app = express();
@@ -33,6 +35,8 @@ app.use('/api/rewards', rewardRoutes);
 app.use('/api/roulette', rouletteRoutes);
 app.use('/api/public/claims', publicClaimRoutes);
 app.use('/api/uploads', uploadRoutes);
+app.use('/api/articles', articleRoutes);
+app.use('/api/esports', esportsRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err);
