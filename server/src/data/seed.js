@@ -225,3 +225,72 @@ if (prizeCount === 0) {
   prizes.forEach((p) => insertPrize.run(p.name, p.icon, p.type, p.amount, p.weight, p.claim));
   console.log('Roulette prizes seeded.');
 }
+
+const articleCount = db.prepare('SELECT COUNT(*) AS c FROM articles').get().c;
+if (articleCount === 0) {
+  console.log('Seeding sample articles...');
+  const insertArticle = db.prepare(
+    `INSERT INTO articles (title, cover_image, excerpt, content, category, min_read_seconds, reward_tickets, reward_coins, reward_xp, quiz_question, quiz_choices_json, quiz_correct_index, published)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`
+  );
+  const articles = [
+    {
+      title: 'MPL ID Season Terbaru: Jadwal & Format Playoff',
+      icon: '🏆',
+      excerpt: 'Rangkuman format kompetisi MPL Indonesia musim ini, dari regular season sampai grand final.',
+      content:
+        'Mobile Legends Professional League Indonesia (MPL ID) kembali hadir dengan format regular season single round-robin diikuti oleh playoff double-elimination. Setiap tim akan bertanding melawan seluruh peserta lain sebelum delapan besar melaju ke babak playoff. Poin penting yang perlu diperhatikan penggemar adalah jadwal tayang setiap Sabtu dan Minggu, serta sistem best-of-three di regular season yang berubah menjadi best-of-five di semifinal dan grand final. Tim yang finis di posisi atas klasemen regular season mendapat keuntungan berupa upper bracket di playoff, sehingga mereka punya dua kesempatan sebelum tersingkir. Strategi draft hero dan ban-pick juga menjadi sorotan utama karena meta yang terus berubah setiap patch. Ikuti terus perkembangan setiap tim favoritmu dan jangan lewatkan kesempatan untuk menebak skor pertandingan di fitur Tebak Skor supaya dapat tiket roulette tambahan.',
+      category: 'MPL',
+      quiz: { q: 'Format playoff MPL ID musim ini menggunakan sistem apa?', choices: ['Single elimination', 'Double elimination', 'Round-robin penuh'], correct: 1 },
+    },
+    {
+      title: 'Tips Membaca Draft Pick Ala Tim Pro MPL',
+      icon: '🎮',
+      excerpt: 'Kenali pola ban-pick yang sering dipakai tim-tim papan atas MPL untuk menebak strategi mereka.',
+      content:
+        'Salah satu aspek paling menarik dari menonton MPL adalah fase draft pick sebelum pertandingan dimulai. Tim-tim papan atas biasanya memiliki hero prioritas yang mereka amankan lebih dulu, baik untuk dipakai sendiri maupun untuk dilarang dari lawan. Pola umum yang sering terlihat adalah memprioritaskan role jungler dan mid laner terlebih dahulu karena kedua role ini paling berpengaruh terhadap tempo permainan di early game. Selain itu, kombinasi hero yang saling melengkapi seperti crowd control dengan damage dealer sering menjadi andalan. Memahami pola ini akan membantumu memprediksi susunan komposisi tim serta membuat prediksi skor pertandingan yang lebih akurat di fitur Tebak Skor.',
+      category: 'Strategi',
+      quiz: null,
+    },
+    {
+      title: 'Sejarah Singkat Diamond di Mobile Legends',
+      icon: '💎',
+      excerpt: 'Dari mana asalnya mata uang premium yang sering jadi hadiah roulette di aplikasi ini?',
+      content:
+        'Diamond adalah mata uang premium di dalam game Mobile Legends: Bang Bang yang digunakan pemain untuk membeli skin, hero, dan berbagai item kosmetik lainnya. Sejak diluncurkan, Diamond telah menjadi salah satu incaran utama pemain kompetitif maupun kasual, sehingga banyak platform reward seperti aplikasi ini menjadikannya hadiah utama di roulette. Untuk mendapatkan Diamond secara gratis, pemain biasanya mengandalkan event resmi dari Moonton atau platform pihak ketiga seperti reward artikel dan tebak skor yang kamu mainkan sekarang. Selalu pastikan kamu memasukkan User ID dan Zone ID dengan benar saat proses klaim supaya Diamond dapat masuk ke akun yang tepat.',
+      category: 'Umum',
+      quiz: { q: 'Diamond di Mobile Legends dipakai untuk membeli apa?', choices: ['Skin & hero', 'Internet paket', 'Voucher makanan'], correct: 0 },
+    },
+  ];
+  articles.forEach((a) => {
+    insertArticle.run(
+      a.title,
+      a.icon,
+      a.excerpt,
+      a.content,
+      a.category,
+      Math.max(20, Math.round((a.content.split(/\s+/).length / 200) * 60)),
+      1,
+      15,
+      15,
+      a.quiz?.q || null,
+      a.quiz ? JSON.stringify(a.quiz.choices) : null,
+      a.quiz ? a.quiz.correct : null
+    );
+  });
+  console.log('Sample articles seeded.');
+}
+
+const matchCount = db.prepare('SELECT COUNT(*) AS c FROM esports_matches').get().c;
+if (matchCount === 0) {
+  console.log('Seeding sample MPL matches...');
+  const insertMatch = db.prepare(
+    `INSERT INTO esports_matches (league, team_a, team_b, team_a_logo, team_b_logo, best_of, match_time, reward_exact_tickets, reward_winner_tickets)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  );
+  const in3days = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString();
+  const in5days = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString();
+  insertMatch.run('MPL ID', 'RRQ Hoshi', 'ONIC Esports', '⚔️', '🔥', 3, in3days, 5, 1);
+  insertMatch.run('MPL ID', 'EVOS Legends', 'Bigetron Alpha', '🦅', '🦁', 5, in5days, 8, 2);
+  console.log('Sample MPL matches seeded.');
+}

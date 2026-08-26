@@ -56,6 +56,59 @@ export function serializePrize(p, { includeWeight = false } = {}) {
   };
 }
 
+export function serializeArticle(a, { includeQuizAnswer = false, readState = null } = {}) {
+  return {
+    id: a.id,
+    title: a.title,
+    coverImage: a.cover_image,
+    excerpt: a.excerpt,
+    content: a.content,
+    category: a.category,
+    minReadSeconds: a.min_read_seconds,
+    rewardTickets: a.reward_tickets,
+    rewardCoins: a.reward_coins,
+    rewardXp: a.reward_xp,
+    hasQuiz: !!a.quiz_question,
+    quizQuestion: a.quiz_question || null,
+    quizChoices: a.quiz_choices_json ? JSON.parse(a.quiz_choices_json) : null,
+    ...(includeQuizAnswer ? { quizCorrectIndex: a.quiz_correct_index } : {}),
+    published: !!a.published,
+    createdAt: a.created_at,
+    ...(readState ? { readState } : {}),
+  };
+}
+
+export function serializeMatch(m, { prediction = null, now = Date.now() } = {}) {
+  const locked = !!m.settled || now >= new Date(m.match_time).getTime();
+  return {
+    id: m.id,
+    league: m.league,
+    teamA: m.team_a,
+    teamB: m.team_b,
+    teamALogo: m.team_a_logo,
+    teamBLogo: m.team_b_logo,
+    bestOf: m.best_of,
+    matchTime: m.match_time,
+    locked,
+    settled: !!m.settled,
+    status: m.settled ? 'finished' : locked ? 'locked' : 'upcoming',
+    scoreA: m.settled ? m.score_a : null,
+    scoreB: m.settled ? m.score_b : null,
+    rewardExactTickets: m.reward_exact_tickets,
+    rewardWinnerTickets: m.reward_winner_tickets,
+    myPrediction: prediction
+      ? {
+          scoreA: prediction.pred_score_a,
+          scoreB: prediction.pred_score_b,
+          result: prediction.result,
+          ticketsAwarded: prediction.tickets_awarded,
+          coinsAwarded: prediction.coins_awarded,
+          xpAwarded: prediction.xp_awarded,
+        }
+      : null,
+  };
+}
+
 export function serializeClaim(c) {
   return {
     id: c.id,

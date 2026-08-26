@@ -463,3 +463,75 @@ table.admin-table td {
   background: var(--teal-3);
   color: #fff;
 }
+
+.quick-link-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.quick-link-card {
+  border-radius: var(--radius);
+  padding: 12px;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: transform 0.1s ease;
+}
+
+.quick-link-card:active {
+  transform: scale(0.97);
+}
+
+.quick-link-card.articles {
+  background: linear-gradient(135deg, #ffb84c, var(--orange));
+}
+
+.quick-link-card.esports {
+  background: linear-gradient(135deg, #a855f7, #6d28d9);
+}
+
+.quick-link-card.multiplayer {
+  background: linear-gradient(135deg, var(--teal-3), var(--teal-1));
+}
+
+.quick-link-card.submit {
+  background: linear-gradient(135deg, #34d399, var(--green));
+}
+
+.article-card {
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.article-card-cover {
+  font-size: 34px;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef6f5;
+  border-radius: 12px;
+}
+
+.mini-badge {
+  display: inline-block;
+  background: #eef6f5;
+  color: #1c2b2a;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.mini-badge.done {
+  background: #d9f5ea;
+  color: #0d8f5f;
+}
+
+.match-card {
+  margin-bottom: 12px;
+}

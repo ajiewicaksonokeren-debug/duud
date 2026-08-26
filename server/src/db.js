@@ -127,6 +127,81 @@ CREATE TABLE IF NOT EXISTS reward_claims (
   expires_at TEXT NOT NULL,
   claimed_at TEXT
 );
+
+-- Reward articles (CMS). Reading one to completion grants roulette tickets
+-- (the shared "token" currency spun in the same roulette as game rewards).
+CREATE TABLE IF NOT EXISTS articles (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title TEXT NOT NULL,
+  cover_image TEXT NOT NULL DEFAULT '',
+  excerpt TEXT NOT NULL DEFAULT '',
+  content TEXT NOT NULL,
+  category TEXT NOT NULL DEFAULT 'Umum',
+  min_read_seconds INTEGER NOT NULL DEFAULT 30,
+  reward_tickets INTEGER NOT NULL DEFAULT 1,
+  reward_coins INTEGER NOT NULL DEFAULT 15,
+  reward_xp INTEGER NOT NULL DEFAULT 15,
+  quiz_question TEXT,
+  quiz_choices_json TEXT,
+  quiz_correct_index INTEGER,
+  published INTEGER NOT NULL DEFAULT 1,
+  created_by INTEGER REFERENCES users(id),
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- One row per (user, article), enforced by the UNIQUE key, so the reward can
+-- only ever be granted once per article per account. session_token +
+-- started_at are set server-side when reading begins and checked again on
+-- completion so the reward timer can't be spoofed from the client.
+CREATE TABLE IF NOT EXISTS article_reads (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  article_id INTEGER NOT NULL REFERENCES articles(id) ON DELETE CASCADE,
+  session_token TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'reading', -- reading | completed
+  started_at TEXT NOT NULL DEFAULT (datetime('now')),
+  completed_at TEXT,
+  ip_hash TEXT,
+  flagged INTEGER NOT NULL DEFAULT 0,
+  UNIQUE(user_id, article_id)
+);
+
+-- Tebak Skor: score-prediction contest for esports matches (e.g. MPL).
+CREATE TABLE IF NOT EXISTS esports_matches (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  league TEXT NOT NULL DEFAULT 'MPL ID',
+  team_a TEXT NOT NULL,
+  team_b TEXT NOT NULL,
+  team_a_logo TEXT NOT NULL DEFAULT '',
+  team_b_logo TEXT NOT NULL DEFAULT '',
+  best_of INTEGER NOT NULL DEFAULT 3,
+  match_time TEXT NOT NULL,
+  score_a INTEGER,
+  score_b INTEGER,
+  settled INTEGER NOT NULL DEFAULT 0,
+  reward_exact_tickets INTEGER NOT NULL DEFAULT 5,
+  reward_winner_tickets INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- One prediction per (user, match). Predictions are only accepted while the
+-- server clock is still before match_time (see routes/esports.js) -- the
+-- client's clock is never trusted for the lock check.
+CREATE TABLE IF NOT EXISTS match_predictions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  match_id INTEGER NOT NULL REFERENCES esports_matches(id) ON DELETE CASCADE,
+  pred_score_a INTEGER NOT NULL,
+  pred_score_b INTEGER NOT NULL,
+  ip_hash TEXT,
+  result TEXT, -- null until settled, then: exact | winner | wrong
+  tickets_awarded INTEGER NOT NULL DEFAULT 0,
+  coins_awarded INTEGER NOT NULL DEFAULT 0,
+  xp_awarded INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(user_id, match_id)
+);
 `);
 
 export default db;
