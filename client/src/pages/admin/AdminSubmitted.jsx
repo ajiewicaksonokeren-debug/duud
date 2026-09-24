@@ -45,7 +45,7 @@ export default function AdminSubmitted({ showToast }) {
     <div>
       {pending.map((s) => (
         <div key={s.id} className="card" style={{ marginBottom: 12 }}>
-          <div style={{ fontSize: 12, color: '#5b7a78', marginBottom: 6 }}>Dikirim oleh: {s.username}</div>
+          <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 6 }}>Dikirim oleh: {s.username}</div>
           <div style={{ transform: 'scale(0.7)', transformOrigin: 'top left', marginBottom: -50 }}>
             <QuestionCard clues={s.clues} />
           </div>

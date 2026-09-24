@@ -191,7 +191,7 @@ export default function AdminQuestions({ showToast }) {
           </tbody>
         </table>
         {filtered.length > visibleQuestions.length && (
-          <p style={{ fontSize: 11, color: '#5b7a78', marginTop: 8 }}>
+          <p style={{ fontSize: 11, color: 'var(--muted)', marginTop: 8 }}>
             Menampilkan {visibleQuestions.length} dari {filtered.length} soal. Gunakan filter kategori untuk mempersempit.
           </p>
         )}

@@ -5,7 +5,7 @@ import { useToast } from '../hooks/useToast.js';
 import Toast from '../components/Toast.jsx';
 import { openExternal } from '../utils/openExternal.js';
 
-const WHEEL_COLORS = ['#17c9be', '#ff8c42', '#ffd23f', '#1fbf8f', '#232946', '#ef4444', '#12a89e', '#a855f7'];
+const WHEEL_COLORS = ['#ffe000', '#ff4d00', '#f5f2e8', '#ffffff'];
 
 export default function Roulette() {
   const { user, refreshMe } = useAuth();
@@ -26,7 +26,7 @@ export default function Roulette() {
     ? `conic-gradient(${prizes
         .map((p, i) => `${WHEEL_COLORS[i % WHEEL_COLORS.length]} ${i * segAngle}deg ${(i + 1) * segAngle}deg`)
         .join(', ')})`
-    : '#232946';
+    : 'var(--ink)';
 
   async function handleSpin() {
     if (spinning || !user?.rouletteTickets) return;
@@ -58,7 +58,7 @@ export default function Roulette() {
     <div>
       <Toast toast={toast} />
       <div className="section-title">🎰 Roulette Hadiah</div>
-      <p style={{ color: 'var(--text-dim)', fontSize: 12, marginTop: -6 }}>
+      <p style={{ color: 'var(--text-dim)', fontSize: 12 }}>
         Setiap berhasil menjawab soal dengan benar, kamu dapat 1 tiket roulette. Putar untuk memenangkan koin,
         diamond, dan hadiah lainnya!
       </p>
@@ -82,11 +82,10 @@ export default function Roulette() {
             height: 260,
             borderRadius: '50%',
             background: gradient,
-            border: '6px solid var(--navy)',
             position: 'relative',
             transition: spinning ? 'transform 4.2s cubic-bezier(0.15, 0.8, 0.15, 1)' : 'none',
             transform: `rotate(${rotation}deg)`,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
+            border: '5px solid var(--ink)',
           }}
         >
           {prizes.map((p, i) => {
@@ -104,7 +103,7 @@ export default function Roulette() {
                   transform: 'translate(-50%, -50%)',
                   fontSize: 12,
                   fontWeight: 800,
-                  color: '#1c2b2a',
+                  color: 'var(--ink)',
                   textAlign: 'center',
                   width: 56,
                   lineHeight: 1.15,
@@ -137,7 +136,7 @@ export default function Roulette() {
       </div>
 
       <div style={{ textAlign: 'center', marginBottom: 12 }}>
-        <span className="stat-pill" style={{ background: 'rgba(255,255,255,0.1)' }}>
+        <span className="stat-pill">
           🎟️ {user?.rouletteTickets ?? 0} tiket
         </span>
       </div>
@@ -152,7 +151,7 @@ export default function Roulette() {
           <h3 style={{ margin: '4px 0' }}>Selamat! Kamu dapat {result.prize.name}</h3>
           {result.claimUrl ? (
             <>
-              <p style={{ fontSize: 13, color: '#5b7a78' }}>
+              <p style={{ fontSize: 13, color: 'var(--muted)' }}>
                 Hadiah ini perlu diklaim di website esportsku.com. Link ini unik dan hanya berlaku sekali.
               </p>
               <button className="btn block" onClick={() => openExternal(result.claimUrl)}>
@@ -160,7 +159,7 @@ export default function Roulette() {
               </button>
             </>
           ) : (
-            <p style={{ fontSize: 13, color: '#5b7a78' }}>Hadiah sudah otomatis masuk ke akunmu.</p>
+            <p style={{ fontSize: 13, color: 'var(--muted)' }}>Hadiah sudah otomatis masuk ke akunmu.</p>
           )}
         </div>
       )}

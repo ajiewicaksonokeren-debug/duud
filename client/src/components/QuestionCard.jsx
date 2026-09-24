@@ -5,15 +5,19 @@ export function resolveImageUrl(value) {
   return value.startsWith('/') ? `${API_BASE}${value}` : value;
 }
 
-export default function QuestionCard({ clues }) {
+export default function QuestionCard({ clues, shake = false, blur = 0, children }) {
   return (
-    <div className="question-card">
-      {clues.map((c, i) => {
-        if (c.type === 'emoji') return <span key={i} className="clue-emoji">{c.value}</span>;
-        if (c.type === 'image')
-          return <img key={i} className="clue-image" src={resolveImageUrl(c.value)} alt="clue" />;
-        return <span key={i} className="clue-text">{c.value}</span>;
-      })}
+    <div className={`question-card ${shake ? 'shake' : ''}`}>
+      <div className="tag">TEBAK<br />GAMBAR</div>
+      <div className="clues" style={blur ? { filter: `blur(${blur}px)` } : undefined}>
+        {clues.map((c, i) => {
+          if (c.type === 'emoji') return <span key={i} className="clue-emoji">{c.value}</span>;
+          if (c.type === 'image')
+            return <img key={i} className="clue-image" src={resolveImageUrl(c.value)} alt="petunjuk" />;
+          return <span key={i} className="clue-text">{c.value}</span>;
+        })}
+      </div>
+      {children}
     </div>
   );
 }

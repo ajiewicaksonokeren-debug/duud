@@ -87,7 +87,7 @@ export default function AdminBulkImport({ showToast }) {
         </div>
         {error && <p className="error-text">{error}</p>}
         {preview && (
-          <p style={{ fontSize: 12, color: '#1c2b2a', fontWeight: 700 }}>✓ {preview.length} soal siap diimport.</p>
+          <p style={{ fontSize: 12, color: 'var(--ink)', fontWeight: 700 }}>✓ {preview.length} soal siap diimport.</p>
         )}
         <div style={{ display: 'flex', gap: 8 }}>
           <button type="button" className="btn secondary" onClick={validateAndPreview}>

@@ -6,6 +6,30 @@ import { levelFromXp } from '../utils/leveling.js';
 
 const router = Router();
 
+const FILLERS = 'AEIOUBKLMNRSTPGD';
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Data for the client-side answer modes (susun huruf / pilihan ganda).
+// The answer itself stays hidden: letters are shuffled with fillers, options are shuffled with decoys.
+function modeData(answer, decoyPool) {
+  const letters = answer.toUpperCase().replace(/[^A-Z0-9]/g, '').split('');
+  const fillers = shuffle(FILLERS.split('')).slice(0, Math.max(3, 14 - letters.length));
+  const decoys = shuffle([...new Set(decoyPool)].filter((a) => a !== answer)).slice(0, 3);
+  return {
+    wordLengths: answer.toUpperCase().split(/\s+/).map((w) => w.replace(/[^A-Z0-9]/g, '').length).filter(Boolean),
+    letters: shuffle(letters.concat(fillers)),
+    options: shuffle([answer, ...decoys]),
+  };
+}
+
 // List all categories with lock state + progress summary for the current user.
 router.get('/', requireAuth, (req, res) => {
   const categories = db.prepare('SELECT * FROM categories ORDER BY order_index ASC, id ASC').all();
@@ -90,10 +114,16 @@ router.get('/:id/questions', requireAuth, (req, res) => {
     .all(req.user.id, category.id);
   const progressByQ = Object.fromEntries(progressRows.map((r) => [r.question_id, r]));
 
+  let decoyPool = questions.map((q) => q.answer);
+  if (new Set(decoyPool).size < 4) {
+    decoyPool = decoyPool.concat(db.prepare('SELECT answer FROM questions ORDER BY RANDOM() LIMIT 12').all().map((r) => r.answer));
+  }
+
   const result = questions.map((q) => {
     const prog = progressByQ[q.id];
     return {
       ...serializeQuestion(q, { includeAnswer: !!prog?.solved }),
+      ...(prog?.solved ? {} : modeData(q.answer, decoyPool)),
       solved: !!prog?.solved,
       usedLetterHint: !!prog?.used_letter_hint,
       usedAnswerKey: !!prog?.used_answer_key,

@@ -1,5 +1,13 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { Link, NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+
+const NAV = [
+  { to: '/', icon: '🏠', label: 'Main', end: true },
+  { to: '/multiplayer', icon: '⚔️', label: 'Duel' },
+  { to: '/roulette', icon: '🎡', label: 'Roulette' },
+  { to: '/kirim-soal', icon: '📤', label: 'Kirim' },
+  { to: '/profile', icon: '👤', label: 'Profil' },
+];
 
 export default function Layout() {
   const { user } = useAuth();
@@ -7,37 +15,26 @@ export default function Layout() {
   return (
     <div className="app-shell">
       <div className="topbar">
-        <h1>🖼️ Tebak Gambar</h1>
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-          <span className="stat-pill">🪙 {user?.coins ?? 0}</span>
-          <span className="stat-pill">🎟️ {user?.rouletteTickets ?? 0}</span>
-          <span className="stat-pill">⭐ Lv.{user?.playerLevel ?? 1}</span>
+        <Link to="/" className="brand">
+          TEBAK<br />
+          <span>GAMBAR</span>
+        </Link>
+        <div className="stats">
+          <span className="stat-pill coin">🪙 {(user?.coins ?? 0).toLocaleString('id-ID')}</span>
+          <span className="stat-pill">{user?.rouletteTickets ?? 0}T</span>
+          <span className="stat-pill lv">LV{user?.playerLevel ?? 1}</span>
         </div>
       </div>
       <div className="main-content">
         <Outlet />
       </div>
       <nav className="bottom-nav">
-        <NavLink to="/" end className={({ isActive }) => (isActive ? 'active' : '')}>
-          <span className="icon">🏠</span>
-          Main
-        </NavLink>
-        <NavLink to="/roulette" className={({ isActive }) => (isActive ? 'active' : '')}>
-          <span className="icon">🎰</span>
-          Roulette
-        </NavLink>
-        <NavLink to="/multiplayer" className={({ isActive }) => (isActive ? 'active' : '')}>
-          <span className="icon">🎮</span>
-          Multiplayer
-        </NavLink>
-        <NavLink to="/kirim-soal" className={({ isActive }) => (isActive ? 'active' : '')}>
-          <span className="icon">📝</span>
-          Kirim Soal
-        </NavLink>
-        <NavLink to="/profile" className={({ isActive }) => (isActive ? 'active' : '')}>
-          <span className="icon">👤</span>
-          User
-        </NavLink>
+        {NAV.map((n) => (
+          <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => (isActive ? 'active' : '')}>
+            <span className="icon">{n.icon}</span>
+            {n.label}
+          </NavLink>
+        ))}
       </nav>
     </div>
   );

@@ -177,7 +177,7 @@ export default function MultiplayerRoom() {
       {roundEnd ? (
         <div className="card" style={{ textAlign: 'center', marginTop: 12 }}>
           <p style={{ margin: 0, fontWeight: 700 }}>Jawaban: {roundEnd.answer}</p>
-          <p style={{ fontSize: 12, color: '#5b7a78' }}>Ronde berikutnya sebentar lagi...</p>
+          <p style={{ fontSize: 12, color: 'var(--muted)' }}>Ronde berikutnya sebentar lagi...</p>
         </div>
       ) : (
         <form className="answer-row" onSubmit={submitAnswer} style={{ marginTop: 12 }}>

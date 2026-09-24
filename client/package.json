@@ -7,13 +7,15 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "cap:sync": "vite build && npx cap sync android",
-    "cap:open": "npx cap open android"
+    "cap:sync": "vite build && npx cap sync",
+    "cap:open": "npx cap open android",
+    "cap:open:ios": "npx cap open ios"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",
     "@capacitor/browser": "^8.0.4",
     "@capacitor/core": "^8.5.0",
+    "@capacitor/ios": "^8.5.2",
     "axios": "^1.7.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

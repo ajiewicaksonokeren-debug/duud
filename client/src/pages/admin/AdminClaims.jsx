@@ -32,7 +32,7 @@ export default function AdminClaims() {
             <div style={{ fontSize: 12 }}>{STATUS_LABEL[c.status] || c.status}</div>
           </div>
           {c.formData && (
-            <div style={{ fontSize: 12, color: '#5b7a78', marginTop: 6 }}>
+            <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 6 }}>
               <div>Nama: {c.formData.nama}</div>
               <div>ID Game: {c.formData.idGame}</div>
               <div>Kontak: {c.formData.kontak}</div>
@@ -40,7 +40,7 @@ export default function AdminClaims() {
             </div>
           )}
           {c.status === 'pending' && (
-            <div style={{ fontSize: 11, color: '#5b7a78', marginTop: 6, wordBreak: 'break-all' }}>
+            <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 6, wordBreak: 'break-all' }}>
               Link klaim: {c.claimUrl}
             </div>
           )}

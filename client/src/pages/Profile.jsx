@@ -2,122 +2,94 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api.js';
 import { useAuth } from '../context/AuthContext.jsx';
-import { useToast } from '../hooks/useToast.js';
-import Toast from '../components/Toast.jsx';
 import { openExternal } from '../utils/openExternal.js';
 
-const CLAIM_STATUS_LABEL = { pending: 'Menunggu diklaim', claimed: 'Sudah diklaim', expired: 'Kedaluwarsa' };
+const CLAIM_STATUS_LABEL = { pending: 'MENUNGGU DIKLAIM', claimed: 'SUDAH DIKLAIM', expired: 'KEDALUWARSA' };
 
 export default function Profile() {
-  const { user, logout, refreshMe } = useAuth();
-  const { toast, showToast } = useToast();
-  const [daily, setDaily] = useState(null);
+  const { user, logout } = useAuth();
   const [leaderboard, setLeaderboard] = useState([]);
   const [claims, setClaims] = useState([]);
 
   useEffect(() => {
-    api.get('/rewards/daily/status').then(({ data }) => setDaily(data));
     api.get('/rewards/leaderboard').then(({ data }) => setLeaderboard(data.leaderboard));
     api.get('/roulette/history').then(({ data }) => setClaims(data.claims));
   }, []);
 
-  async function claimDaily() {
-    try {
-      const { data } = await api.post('/rewards/daily/claim');
-      showToast(`+${data.coinsAwarded} koin, +${data.xpAwarded} xp!`, 'success');
-      await refreshMe();
-      setDaily((d) => ({ ...d, claimedToday: true }));
-    } catch (err) {
-      showToast(err?.response?.data?.error || 'Gagal klaim reward.', 'error');
-    }
-  }
+  const rank = leaderboard.findIndex((r) => r.username === user?.username) + 1;
+  const stats = [
+    { value: (user?.xp ?? 0).toLocaleString('id-ID'), label: 'XP' },
+    { value: user?.rouletteTickets ?? 0, label: 'Tiket' },
+    { value: rank ? `#${rank}` : '—', label: 'Peringkat' },
+  ];
 
   return (
-    <div>
-      <Toast toast={toast} />
-      <div className="card" style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: 48 }}>{user?.avatar}</div>
-        <h2 style={{ margin: '6px 0' }}>{user?.username}</h2>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 16, margin: '10px 0' }}>
-          <div>
-            <div style={{ fontSize: 20, fontWeight: 800 }}>🪙 {user?.coins}</div>
-            <div style={{ fontSize: 11, color: '#5b7a78' }}>Koin</div>
+    <>
+      <div className="hero-user">
+        <div className="avatar" style={{ width: 76, fontSize: 36 }}>{user?.avatar}</div>
+        <div className="body" style={{ padding: 12 }}>
+          <div className="display" style={{ fontSize: 26, lineHeight: 0.9 }}>{user?.username}</div>
+          <div className="mono muted" style={{ marginTop: 5, letterSpacing: '.08em' }}>
+            LEVEL {user?.playerLevel} / {user?.xp - user?.xpFloor} DARI {user?.xpCeiling - user?.xpFloor} XP
           </div>
-          <div>
-            <div style={{ fontSize: 20, fontWeight: 800 }}>⭐ Lv.{user?.playerLevel}</div>
-            <div style={{ fontSize: 11, color: '#5b7a78' }}>Level</div>
+          <div className="progress accent" style={{ marginTop: 8 }}>
+            <div style={{ width: `${Math.round((user?.xpProgress || 0) * 100)}%` }} />
           </div>
-          <div>
-            <div style={{ fontSize: 20, fontWeight: 800 }}>✨ {user?.xp}</div>
-            <div style={{ fontSize: 11, color: '#5b7a78' }}>XP</div>
-          </div>
-        </div>
-        <div className="progress-bar" style={{ background: '#e2e8f0' }}>
-          <div
-            style={{
-              width: `${Math.round((user?.xpProgress || 0) * 100)}%`,
-              background: 'var(--teal-2)',
-            }}
-          />
-        </div>
-        <div style={{ fontSize: 11, color: '#5b7a78', marginTop: 4 }}>
-          {user?.xp - user?.xpFloor}/{user?.xpCeiling - user?.xpFloor} xp menuju Lv.{(user?.playerLevel || 1) + 1}
         </div>
       </div>
 
-      <div className="section-title">Reward Harian</div>
-      <div className="card">
-        <p style={{ marginTop: 0 }}>Klaim koin & XP gratis setiap hari!</p>
-        <button className="btn block warn" onClick={claimDaily} disabled={daily?.claimedToday}>
-          {daily?.claimedToday ? 'Sudah diklaim hari ini' : `Klaim +${daily?.coins ?? 50} Koin, +${daily?.xp ?? 20} XP`}
-        </button>
+      <div className="split" style={{ background: 'var(--white)' }}>
+        {stats.map((s) => (
+          <div key={s.label}>
+            <div className="display" style={{ fontSize: 26, lineHeight: 1, letterSpacing: 0 }}>{s.value}</div>
+            <div className="mono muted" style={{ fontSize: 9, marginTop: 5 }}>{s.label}</div>
+          </div>
+        ))}
       </div>
 
       {claims.length > 0 && (
-        <>
-          <div className="section-title">Riwayat Hadiah Roulette</div>
-          {claims.map((c) => (
-            <div key={c.id} className="card" style={{ marginBottom: 8 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <div style={{ fontWeight: 700 }}>{c.prizeName}</div>
-                  <div style={{ fontSize: 11, color: '#5b7a78' }}>{CLAIM_STATUS_LABEL[c.status] || c.status}</div>
+        <div>
+          <div className="bar-title">Riwayat klaim hadiah</div>
+          <div className="list" style={{ borderTop: 'none' }}>
+            {claims.map((c) => (
+              <div key={c.id} className="row" style={{ padding: 0, alignItems: 'stretch' }}>
+                <div className="grow" style={{ padding: '11px 12px' }}>
+                  <div className="display" style={{ fontSize: 14, letterSpacing: 0, lineHeight: 1 }}>{c.prizeName}</div>
+                  <div className="mono muted" style={{ marginTop: 3, letterSpacing: 0 }}>{CLAIM_STATUS_LABEL[c.status] || c.status}</div>
                 </div>
                 {c.status === 'pending' && (
-                  <button className="btn warn" style={{ padding: '8px 12px', fontSize: 12 }} onClick={() => openExternal(c.claimUrl)}>
-                    Klaim di esportsku.com
+                  <button
+                    onClick={() => openExternal(c.claimUrl)}
+                    style={{ border: 'none', borderLeft: '3px solid var(--ink)', background: 'var(--orange)', color: 'var(--white)', padding: '0 13px' }}
+                    className="mono"
+                  >
+                    KLAIM ↗
                   </button>
                 )}
               </div>
-            </div>
-          ))}
-        </>
+            ))}
+          </div>
+        </div>
       )}
 
-      <div className="section-title">Papan Peringkat</div>
       <div>
+        <div className="bar-title" style={{ marginBottom: 0 }}>Papan peringkat <small>TOP 20 XP</small></div>
         {leaderboard.map((row, i) => (
-          <div key={row.username} className="leaderboard-row">
-            <span className="rank">#{i + 1}</span>
-            <span>{row.avatar}</span>
-            <span className="name">{row.username}</span>
-            <span style={{ fontWeight: 700 }}>{row.xp} xp</span>
+          <div key={row.username} className={`leaderboard-row ${row.username === user?.username ? 'me' : ''}`}>
+            <span className="rank" style={row.username === user?.username ? { color: 'var(--orange)' } : undefined}>{i + 1}</span>
+            <span style={{ fontSize: 21 }}>{row.avatar}</span>
+            <span className="name ellipsis">{row.username}</span>
+            <span className="mono" style={{ fontSize: 12, letterSpacing: 0 }}>{row.xp.toLocaleString('id-ID')}</span>
           </div>
         ))}
       </div>
 
       {user?.isAdmin && (
-        <>
-          <div className="section-title">Menu Lainnya</div>
-          <Link to="/admin" className="btn secondary block" style={{ display: 'block', textAlign: 'center', textDecoration: 'none', marginBottom: 8 }}>
-            🛠️ Panel Admin
-          </Link>
-        </>
+        <Link to="/admin" className="btn secondary block" style={{ textAlign: 'center', textDecoration: 'none', color: 'var(--yellow)', boxShadow: '5px 5px 0 var(--orange)' }}>
+          🛠 PANEL ADMIN (CMS SOAL)
+        </Link>
       )}
-
-      <button className="btn secondary block" style={{ marginTop: 8 }} onClick={logout}>
-        Keluar
-      </button>
-    </div>
+      <button className="btn ghost block" style={{ padding: 14, fontSize: 12 }} onClick={logout}>KELUAR</button>
+    </>
   );
 }

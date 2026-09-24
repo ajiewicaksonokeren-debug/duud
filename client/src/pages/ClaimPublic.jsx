@@ -52,7 +52,7 @@ export default function ClaimPublic() {
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: 44 }}>{STATUS_INFO[claim.status]?.emoji || '❓'}</div>
             <h3>{STATUS_INFO[claim.status]?.title || 'Status Tidak Diketahui'}</h3>
-            <p style={{ color: '#5b7a78' }}>{STATUS_INFO[claim.status]?.text}</p>
+            <p style={{ color: 'var(--muted)' }}>{STATUS_INFO[claim.status]?.text}</p>
             {claim.prizeName && <p style={{ fontWeight: 700 }}>Hadiah: {claim.prizeName}</p>}
           </div>
         )}
@@ -62,8 +62,8 @@ export default function ClaimPublic() {
             <div style={{ textAlign: 'center', marginBottom: 16 }}>
               <div style={{ fontSize: 44 }}>🎁</div>
               <h3 style={{ margin: '4px 0' }}>Selamat, {claim.username}!</h3>
-              <p style={{ fontWeight: 700, color: '#1c2b2a' }}>Kamu memenangkan: {claim.prizeName}</p>
-              <p style={{ fontSize: 12, color: '#5b7a78' }}>
+              <p style={{ fontWeight: 700, color: 'var(--ink)' }}>Kamu memenangkan: {claim.prizeName}</p>
+              <p style={{ fontSize: 12, color: 'var(--muted)' }}>
                 Isi form di bawah untuk klaim hadiahmu. Link ini hanya bisa dipakai satu kali.
               </p>
             </div>
@@ -101,7 +101,7 @@ export default function ClaimPublic() {
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: 44 }}>🎉</div>
             <h3>Klaim Berhasil Dikirim!</h3>
-            <p style={{ color: '#5b7a78' }}>Tim esportsku akan memproses hadiahmu segera. Terima kasih!</p>
+            <p style={{ color: 'var(--muted)' }}>Tim esportsku akan memproses hadiahmu segera. Terima kasih!</p>
           </div>
         )}
       </div>
