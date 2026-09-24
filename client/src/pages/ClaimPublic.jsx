@@ -74,7 +74,7 @@ export default function ClaimPublic() {
                 <input value={form.nama} onChange={(e) => setForm({ ...form, nama: e.target.value })} required />
               </div>
               <div className="field">
-                <label>ID Game / Username Esports</label>
+                <label>{claim.prizeType === 'cash' ? 'Nomor e-wallet (DANA / OVO / GoPay)' : 'ID Game / Username Esports'}</label>
                 <input value={form.idGame} onChange={(e) => setForm({ ...form, idGame: e.target.value })} required />
               </div>
               <div className="field">

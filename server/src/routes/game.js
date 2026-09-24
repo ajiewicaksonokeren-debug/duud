@@ -3,6 +3,7 @@ import db from '../db.js';
 import { requireAuth } from '../middleware/auth.js';
 import { serializeUser } from '../utils/serialize.js';
 import { normalizeAnswer } from '../utils/normalize.js';
+import { RUSH } from '../utils/rush.js';
 
 const router = Router();
 
@@ -32,8 +33,21 @@ router.post('/questions/:id/answer', requireAuth, (req, res) => {
   const guess = normalizeAnswer(req.body?.answer);
   const correct = guess === normalizeAnswer(question.answer);
 
+  // Rush tank: a full tank is banked until used; below that, any wrong guess empties it.
   if (!correct) {
-    return res.json({ correct: false });
+    db.prepare('UPDATE users SET rush_meter = 0 WHERE id = ? AND rush_meter < ?').run(req.user.id, RUSH.meterMax);
+    return res.json({ correct: false, user: serializeUser(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) });
+  }
+
+  // "Perfect" = first try (client marks retries unclean), no hint, no deletion/paste, answered under 2s.
+  // ms/clean are client-reported; the money is protected by the server-timed rush itself.
+  const ms = Number(req.body?.ms);
+  const perfect =
+    req.body?.clean === true && ms > 0 && ms < RUSH.fastMs && !prog.used_letter_hint && !prog.used_answer_key;
+  let rushMeter = req.user.rush_meter;
+  if (rushMeter < RUSH.meterMax) {
+    if (perfect) rushMeter += 1;
+    else if (req.body?.clean === false) rushMeter = 0;
   }
 
   let coinsAwarded = question.reward_coins;
@@ -46,12 +60,9 @@ router.post('/questions/:id/answer', requireAuth, (req, res) => {
   const ticketsAwarded = 1;
 
   db.prepare("UPDATE progress SET solved = 1, solved_at = datetime('now') WHERE id = ?").run(prog.id);
-  db.prepare('UPDATE users SET coins = coins + ?, xp = xp + ?, roulette_tickets = roulette_tickets + ? WHERE id = ?').run(
-    coinsAwarded,
-    xpAwarded,
-    ticketsAwarded,
-    req.user.id
-  );
+  db.prepare(
+    'UPDATE users SET coins = coins + ?, xp = xp + ?, roulette_tickets = roulette_tickets + ?, rush_meter = ? WHERE id = ?'
+  ).run(coinsAwarded, xpAwarded, ticketsAwarded, rushMeter, req.user.id);
 
   const updatedUser = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id);
   res.json({
@@ -80,7 +91,9 @@ router.post('/questions/:id/hint', requireAuth, (req, res) => {
     return res.status(400).json({ error: 'Koin tidak cukup.' });
   }
 
-  db.prepare('UPDATE users SET coins = coins - ? WHERE id = ?').run(cost, req.user.id);
+  db.prepare(
+    'UPDATE users SET coins = coins - ?, rush_meter = CASE WHEN rush_meter < ? THEN 0 ELSE rush_meter END WHERE id = ?'
+  ).run(cost, RUSH.meterMax, req.user.id);
 
   if (type === 'answer') {
     db.prepare('UPDATE progress SET used_answer_key = 1 WHERE id = ?').run(prog.id);

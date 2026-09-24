@@ -11,6 +11,7 @@ import ClaimPublic from './pages/ClaimPublic.jsx';
 import Admin from './pages/admin/Admin.jsx';
 import MultiplayerLobby from './pages/multiplayer/MultiplayerLobby.jsx';
 import MultiplayerRoom from './pages/multiplayer/MultiplayerRoom.jsx';
+import Rush from './pages/Rush.jsx';
 
 function RequireAuth({ children }) {
   const { user, loading } = useAuth();
@@ -31,6 +32,15 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       {/* Public claim page opened via in-app browser (Custom Tabs), no login required. */}
       <Route path="/rewards/id/:token" element={<ClaimPublic />} />
+      {/* Full-screen, outside Layout: leaving mid-rush means losing it. */}
+      <Route
+        path="/rush"
+        element={
+          <RequireAuth>
+            <Rush />
+          </RequireAuth>
+        }
+      />
       <Route
         path="/"
         element={

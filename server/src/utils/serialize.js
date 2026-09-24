@@ -1,4 +1,5 @@
 import { xpProgress } from './leveling.js';
+import { RUSH } from './rush.js';
 
 export function serializeUser(user) {
   const prog = xpProgress(user.xp);
@@ -15,6 +16,8 @@ export function serializeUser(user) {
     rouletteTickets: user.roulette_tickets,
     avatar: user.avatar,
     lastDailyClaim: user.last_daily_claim,
+    rushMeter: user.rush_meter ?? 0,
+    rushMeterMax: RUSH.meterMax,
   };
 }
 

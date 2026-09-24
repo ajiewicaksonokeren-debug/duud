@@ -12,6 +12,17 @@ function claimUrlFor(token) {
   return `${base}/rewards/id/${token}`;
 }
 
+// Single-use claim link, fulfilled manually by the esportsku team (roulette + Rush Moment).
+export function createClaim(userId, prize) {
+  const token = crypto.randomBytes(20).toString('hex');
+  const expiresAt = new Date(Date.now() + CLAIM_TTL_DAYS * 24 * 60 * 60 * 1000).toISOString();
+  db.prepare(
+    `INSERT INTO reward_claims (user_id, prize_id, prize_name, prize_type, prize_amount, token, expires_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`
+  ).run(userId, prize.id ?? null, prize.name, prize.type, prize.amount, token, expiresAt);
+  return claimUrlFor(token);
+}
+
 function pickWeighted(prizes) {
   const total = prizes.reduce((sum, p) => sum + p.weight, 0);
   let roll = Math.random() * total;
@@ -53,13 +64,7 @@ router.post('/spin', requireAuth, (req, res) => {
   if (prize.type === 'coin' && !prize.requires_claim) {
     db.prepare('UPDATE users SET coins = coins + ? WHERE id = ?').run(prize.amount, req.user.id);
   } else if (prize.requires_claim) {
-    const token = crypto.randomBytes(20).toString('hex');
-    const expiresAt = new Date(Date.now() + CLAIM_TTL_DAYS * 24 * 60 * 60 * 1000).toISOString();
-    db.prepare(
-      `INSERT INTO reward_claims (user_id, prize_id, prize_name, prize_type, prize_amount, token, expires_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`
-    ).run(req.user.id, prize.id, prize.name, prize.type, prize.amount, token, expiresAt);
-    claimUrl = claimUrlFor(token);
+    claimUrl = createClaim(req.user.id, prize);
   }
 
   const updatedUser = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id);

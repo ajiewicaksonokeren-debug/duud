@@ -127,6 +127,22 @@ CREATE TABLE IF NOT EXISTS reward_claims (
   expires_at TEXT NOT NULL,
   claimed_at TEXT
 );
+
+-- Rush Moment runs: questions are served one at a time and timed on the server.
+CREATE TABLE IF NOT EXISTS rush_runs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  question_ids_json TEXT NOT NULL,
+  idx INTEGER NOT NULL DEFAULT 0,
+  started_ms INTEGER NOT NULL,
+  served_ms INTEGER NOT NULL,
+  status TEXT NOT NULL DEFAULT 'active', -- active | won | lost
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
 `);
+
+if (!db.prepare('PRAGMA table_info(users)').all().some((c) => c.name === 'rush_meter')) {
+  db.exec('ALTER TABLE users ADD COLUMN rush_meter INTEGER NOT NULL DEFAULT 0');
+}
 
 export default db;

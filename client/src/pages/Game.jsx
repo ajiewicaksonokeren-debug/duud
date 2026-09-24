@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../api.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../hooks/useToast.js';
 import Toast from '../components/Toast.jsx';
 import QuestionCard from '../components/QuestionCard.jsx';
+import RushTank from '../components/RushTank.jsx';
 import { rollMode, shuffle } from '../utils/modes.js';
 
 const CONFETTI = ['#0d0d0d', '#ffe000', '#f5f2e8'];
@@ -24,7 +25,7 @@ function freshRound(q, prevMode) {
 export default function Game() {
   const { categoryId } = useParams();
   const navigate = useNavigate();
-  const { refreshMe } = useAuth();
+  const { user, setUser } = useAuth();
   const { toast, showToast } = useToast();
 
   const [category, setCategory] = useState(null);
@@ -37,6 +38,14 @@ export default function Game() {
   const [busy, setBusy] = useState(false);
 
   const current = questions[index];
+
+  // Rush tank: timed from the first time this question is shown; any retry, deletion, paste or hint makes it unclean.
+  const guess = useRef({ qid: null, start: 0, clean: true });
+  useEffect(() => {
+    if (playing && current && guess.current.qid !== current.id) {
+      guess.current = { qid: current.id, start: performance.now(), clean: true };
+    }
+  }, [playing, current]);
 
   const load = useCallback(async () => {
     try {
@@ -72,12 +81,17 @@ export default function Game() {
     if (!current || busy || !text.trim()) return;
     setBusy(true);
     try {
-      const { data } = await api.post(`/game/questions/${current.id}/answer`, { answer: text });
+      const { data } = await api.post(`/game/questions/${current.id}/answer`, {
+        answer: text,
+        ms: Math.round(performance.now() - guess.current.start),
+        clean: guess.current.clean,
+      });
+      setUser(data.user);
       if (data.correct) {
-        await refreshMe();
         setQuestions((qs) => qs.map((q, i) => (i === index ? { ...q, solved: true, answer: data.answer } : q)));
         setWin(data);
       } else {
+        guess.current.clean = false;
         setShake(true);
         setTimeout(() => setShake(false), 450);
         showToast('Belum tepat — coba lagi', 'error');
@@ -110,6 +124,7 @@ export default function Game() {
   function unpick(at) {
     const s = round.slots[at];
     if (!s) return;
+    guess.current.clean = false;
     const slots = round.slots.slice();
     const pool = round.pool.slice();
     pool[s.from] = { ...pool[s.from], used: false };
@@ -125,7 +140,8 @@ export default function Game() {
   async function hint(type) {
     try {
       const { data } = await api.post(`/game/questions/${current.id}/hint`, { type });
-      await refreshMe();
+      guess.current.clean = false;
+      setUser(data.user);
       if (type === 'answer') return submit(data.answer);
       const shown = data.maskedAnswer.replace(/\s/g, '').split('').filter((c) => c !== '_');
       setQuestions((qs) => qs.map((q, i) => (i === index ? { ...q, usedLetterHint: true } : q)));
@@ -170,7 +186,7 @@ export default function Game() {
   const solvedCount = questions.filter((q) => q.solved).length;
   const allSolved = solvedCount === questions.length;
 
-  if (!playing || allSolved) {
+  if (!playing || (allSolved && !win)) {
     const pct = Math.round((solvedCount / questions.length) * 100);
     return (
       <>
@@ -232,6 +248,8 @@ export default function Game() {
           <div className="mono muted ellipsis" style={{ marginTop: 3, letterSpacing: '.1em' }}>{category.name}</div>
         </div>
       </div>
+
+      <RushTank user={user} />
 
       <div className="mode-strip">
         <div className="emoji" key={current.id}>{round.mode.emoji}</div>
@@ -298,7 +316,11 @@ export default function Game() {
         <form className="answer-row" onSubmit={(e) => { e.preventDefault(); submit(round.typed); }}>
           <input
             value={round.typed}
-            onChange={(e) => setRound({ ...round, typed: e.target.value })}
+            onChange={(e) => {
+              if (!e.target.value.toUpperCase().startsWith(round.typed.toUpperCase())) guess.current.clean = false;
+              setRound({ ...round, typed: e.target.value });
+            }}
+            onPaste={() => (guess.current.clean = false)}
             placeholder="ISI JAWABAN"
             autoFocus
           />
@@ -340,6 +362,9 @@ export default function Game() {
             <div>+{win.xpAwarded ?? 0} XP</div>
             <div>+{win.ticketsAwarded ?? 0} TIKET</div>
           </div>
+          {win.user.rushMeter >= win.user.rushMeterMax && (
+            <button className="btn rush-cta" onClick={() => navigate('/rush')}>⚡ TANGKI PENUH — RUSH MOMENT ▸</button>
+          )}
           <button className="btn" onClick={next}>LANJUT ▸</button>
         </div>
       )}

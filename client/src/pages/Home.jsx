@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../hooks/useToast.js';
 import Toast from '../components/Toast.jsx';
 import { MODES } from '../utils/modes.js';
+import RushTank from '../components/RushTank.jsx';
 
 export default function Home() {
   const { user, refreshMe } = useAuth();
@@ -51,6 +52,8 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      <RushTank user={user} />
 
       <div className="grid2">
         <button className="tile" onClick={claimDaily}>
