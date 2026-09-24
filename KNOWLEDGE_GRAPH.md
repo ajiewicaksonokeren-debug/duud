@@ -25,7 +25,7 @@ Rush Moment (cash prize) — all knobs in server/src/utils/rush.js (+ env RUSH_P
 │     → 0: wrong guess, hint, delete/paste · slow: unchanged · full tank is banked until used
 │     UI: components/RushTank.jsx (Home, Game) · popup = CTA in MANTAP overlay when full
 ├─ Run ──► routes/rush.js (table rush_runs) · page: pages/Rush.jsx (route /rush, outside Layout)
-│     start consumes tank · 10 random one-word answers ≤5 letters (from the level bank)
+│     start consumes tank · 10 random one-word answers ≤10 letters (from the level bank)
 │     clue revealed one at a time · server times 2s/question + 15s total (+500ms network grace)
 │     own A–Z keyboard: no delete key, no text field → no backspace/paste
 ├─ Quota: dailyWinners per WIB day, active runs reserve a slot

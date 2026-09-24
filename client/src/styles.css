@@ -243,7 +243,7 @@ input, select, textarea { width: 100%; padding: 13px; border: 3px solid var(--in
 .rush .timer-bar { border-color: var(--paper); background: transparent; }
 .rush .timer-bar.q > div { background: var(--yellow); }
 .rush .question-card { box-shadow: 9px 9px 0 var(--orange); min-height: 170px; }
-.rush .answer-mask .slot { border-color: var(--paper); color: var(--paper); }
+.rush .answer-mask .slot { width: 30px; border-color: var(--paper); color: var(--paper); }
 .rush .answer-mask .slot.filled { background: var(--yellow); color: var(--ink); }
 .kb { display: flex; flex-direction: column; gap: 6px; margin-top: auto; }
 .kb div { display: flex; gap: 5px; justify-content: center; }
