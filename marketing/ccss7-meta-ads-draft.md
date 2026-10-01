@@ -313,6 +313,34 @@ Setting **semua 8 ad set** (Jakarta & Sukabumi ikut diseragamkan, tetap jangan p
 
 Radius 3 km (±28 km²) hanya menutup sebagian kota besar: Surabaya ±8% luas kota, Semarang ±8%, Bandung ±17%, Malang ±26%; Yogyakarta & Cirebon hampir seluruh kota.
 
+### 13b. Iklan (draft, 1 Okt 2026)
+
+Page **CBN Fiber (55611268280)** + IG terhubung (17841400258497798). Gambar: poster asli (hash 4f4011afece85c5d74148c2efa6c06b0). CTA Pelajari Selengkapnya. Link: artikel resmi cbn.id + UTM `utm_term=<kota>` (link juga ditulis di caption).
+
+| Kota | Ad aktif (draft) | Iklan lama (bit.ly) |
+|---|---|---|
+| Bandung | AD03_Bandung_CBNid · 120253682598710785 | 120253681179930785 PAUSED — hapus manual |
+| Semarang | AD04_Semarang_CBNid · 120253682601350785 | 120253681212530785 PAUSED — hapus manual |
+| Yogyakarta | AD05_Yogyakarta_CBNid · 120253682602570785 | 120253681213760785 PAUSED — hapus manual |
+| Surabaya | AD06_Surabaya_CBNid · 120253682603880785 | 120253681214910785 PAUSED — hapus manual |
+| Malang | AD07_Malang_CBNid · 120253682605450785 | 120253681215870785 PAUSED — hapus manual |
+| Cirebon | AD08_Cirebon_CBNid · 120253682606670785 | 120253681216710785 PAUSED — hapus manual |
+
+Caption (template, nama kota & deadline diganti per kota):
+```
+🎮 <Kota>, siapkan tim terbaikmu!
+
+CBN Championship Series Season 7 resmi buka registrasi! Turnamen ini hadir di 8 kota di Jawa, dan <Kota> jadi salah satu arenanya. Ini kesempatanmu buat menangin battle di kotamu sendiri.
+
+📅 Pendaftaran <Kota> dibuka sampai <deadline> 2026
+👥 Kumpulin squad, atur strategi, dan buktikan skill-mu!
+
+Info lengkap & cara daftar 👉 https://www.cbn.id/id/news/Events/cbn-championship-series-season-7-resmi-buka-registrasi-yuk-daftar-dan-buktikan-skill-mu
+
+#CBNChampionshipSeries #CCSS7 #CBNFiber #Esports<Kota>
+```
+Headline: `<Kota>, Siapkan Tim Terbaikmu!` · Description: `CCSS7 by CBN Fiber`. Placement IG Explore dihapus (deprecated Meta).
+
 ## 12. Knowledge Graph
 
 ```
@@ -325,6 +353,7 @@ CCSS7 Meta Ads (draft, belum dibuat di Ads Manager)
 │       ├─ lokasi: City entry tanpa radius; DKI = region; Kota Yogyakarta ≠ DIY
 │       └─ audiens: Advantage+ (keras: lokasi + usia min 18; saran: 18–34, esports, video games)
 ├─ Ads Manager: campaign 120253680112700785 · flight deadline−11 → deadline+4 · total Rp2.520.000 · 8/8 ad set draft · Jakarta & Sukabumi lewat (jangan publish) · §13
+├─ Ads: 6 draft (Page CBN Fiber, poster asli, link cbn.id + UTM) · 6 lama bit.ly PAUSED · §13b
 ├─ Ad: 1/ad set · single image · 4:5 + 9:16 · CTA LEARN_MORE · Reels OFF
 ├─ Copy: hook "<Kota>, Siapkan Tim Terbaikmu!" · tanpa game/hadiah/kuota · baris "pendaftaran dibuka" terkunci
 ├─ URL: bit.ly/CCSS7 ⚠️ redirect & UTM belum teruji → pakai URL akhir
