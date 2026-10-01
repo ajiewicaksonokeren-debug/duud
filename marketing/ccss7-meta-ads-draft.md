@@ -298,16 +298,16 @@ Jadwal sumber: artikel Pasar Games (partner resmi di poster) "Catat Tanggalnya! 
 |---|---|---|---|---|---|
 | Jakarta | 5–21 Sep | 25–26 Sep | **Tidak tayang** — registrasi & event sudah lewat | 120253680119150785 | Draft, jangan publish |
 | Sukabumi | 5–28 Sep | 2–3 Okt | **Tidak tayang** — registrasi sudah tutup | 120253680176550785 | Draft, jangan publish |
-| Bandung | 5 Sep–5 Okt | 9–10 Okt | 1 Okt 12:00 → 5 Okt 23:59 (5 hari) | 120253680176820785 | Draft, diperbarui |
-| Semarang | 5 Sep–12 Okt | 16–17 Okt | 6 → 12 Okt | 120253680177730785 | Draft, diperbarui |
-| Yogyakarta | 5 Sep–19 Okt | 23–24 Okt | 13 → 19 Okt | — | **Belum dibuat** |
-| Surabaya | 5 Sep–26 Okt | 30–31 Okt | 20 → 26 Okt | 120253680179230785 | Draft, diperbarui |
-| Malang | 5 Sep–2 Nov | 6–7 Nov | 27 Okt → 2 Nov | 120253680179460785 | Draft, diperbarui |
-| Cirebon | 5 Sep–9 Nov | 13–14 Nov | 3 → 9 Nov | — | **Belum dibuat** |
+| Bandung | 5 Sep–5 Okt | 9–10 Okt | 1 Okt 12:00 → 5 Okt 23:59 (5 hari) | 120253680176820785 | Draft |
+| Semarang | 5 Sep–12 Okt | 16–17 Okt | 6 → 12 Okt | 120253680177730785 | Draft |
+| Yogyakarta | 5 Sep–19 Okt | 23–24 Okt | 13 → 19 Okt | 120253680474110785 | Draft |
+| Surabaya | 5 Sep–26 Okt | 30–31 Okt | 20 → 26 Okt | 120253680179230785 | Draft |
+| Malang | 5 Sep–2 Nov | 6–7 Nov | 27 Okt → 2 Nov | 120253680179460785 | Draft |
+| Cirebon | 5 Sep–9 Nov | 13–14 Nov | 3 → 9 Nov | 120253680474230785 | Draft |
 
 Budget: Rp30.000/hari per ad set. Total 6 kota aktif: Bandung 5 hr (Rp150.000) + 5 kota × 7 hr (Rp1.050.000) = **Rp1.200.000** di luar pajak. Flight berurutan → umumnya hanya 1 ad set jalan per hari (±Rp30.000/hari).
 
-Setting ad set yang diperbarui: Reach · billing impressions · cap 2 impresi/7 hari · **pin radius 3 km** (sesuai permintaan) · **usia 18–34 keras (Advantage+ audience OFF)** · semua gender · lokasi home+recent · FB Feed/Stories + IG Feed/Profile/Explore/Stories. Minat belum ditambahkan (ID minat tidak tersedia via API sesi ini — tambahkan *Esports* & *Video games* di UI).
+Setting **semua 8 ad set** (Jakarta & Sukabumi ikut diseragamkan, tetap jangan publish): Reach · billing impressions · cap 2 impresi/7 hari · **pin radius 3 km** (sesuai permintaan) · **usia 18–34 keras (Advantage+ audience OFF)** · semua gender · lokasi home+recent · FB Feed/Stories + IG Feed/Profile/Explore/Stories. Minat belum ditambahkan (ID minat tidak tersedia via API sesi ini — tambahkan *Esports* & *Video games* di UI).
 
 Radius 3 km (±28 km²) hanya menutup sebagian kota besar: Surabaya ±8% luas kota, Semarang ±8%, Bandung ±17%, Malang ±26%; Yogyakarta & Cirebon hampir seluruh kota.
 
@@ -322,7 +322,7 @@ CCSS7 Meta Ads (draft, belum dibuat di Ads Manager)
 │       ├─ end date = min(D7, deadline kota) (⚠️ deadline belum ada)
 │       ├─ lokasi: City entry tanpa radius; DKI = region; Kota Yogyakarta ≠ DIY
 │       └─ audiens: Advantage+ (keras: lokasi + usia min 18; saran: 18–34, esports, video games)
-├─ Ads Manager: campaign 120253680112700785 · flight 7 hari sebelum deadline tiap kota · Jakarta & Sukabumi lewat · Yogya & Cirebon belum dibuat · §13
+├─ Ads Manager: campaign 120253680112700785 · flight 7 hari sebelum deadline tiap kota · 8/8 ad set draft · Jakarta & Sukabumi lewat (jangan publish) · §13
 ├─ Ad: 1/ad set · single image · 4:5 + 9:16 · CTA LEARN_MORE · Reels OFF
 ├─ Copy: hook "<Kota>, Siapkan Tim Terbaikmu!" · tanpa game/hadiah/kuota · baris "pendaftaran dibuka" terkunci
 ├─ URL: bit.ly/CCSS7 ⚠️ redirect & UTM belum teruji → pakai URL akhir
