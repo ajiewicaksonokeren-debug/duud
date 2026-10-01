@@ -42,3 +42,6 @@ Mobile deploy
 Backend deploy: render.yaml (Docker, SQLite on disk)
       ⚠ plan: free + disk — Render free instances don't support persistent disks
 ```
+
+Marketing (bukan bagian app)
+└─ marketing/ccss7-meta-ads-draft.md ── draft Meta Ads CCSS7 8 kota (knowledge graph di §12)
