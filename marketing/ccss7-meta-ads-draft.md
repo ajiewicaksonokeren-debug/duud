@@ -9,8 +9,8 @@ Legenda: ✅ terverifikasi · ⚠️ BELUM TERKONFIRMASI (wajib cek sebelum publ
 
 | # | Temuan | Dampak | Status |
 |---|---|---|---|
-| 1 | **Minimum daily budget akun IDR = Rp17.825/ad set/hari** (dibaca dari API Meta pada semua akun IDR, termasuk *Cbn MarComm ADS* `420729605398411`). | **Rp6.250/ad set ditolak.** 8 ad set paralel butuh min. Rp142.600/hari. | ✅ |
-| 2 | Dengan batas Rp50.000/hari, maksimum **2 ad set** bisa jalan bersamaan (2 × 17.825 = 35.650; 3 × 17.825 = 53.475 > 50.000). | Struktur wajib **bergiliran** → lihat §2. Budget tidak dinaikkan. | ✅ |
+| 1 | **Minimum daily budget akun IDR = Rp17.825/ad set/hari** (dibaca dari API Meta pada semua akun IDR, termasuk *Cbn MarComm ADS* `420729605398411`). | Rp6.250 ditolak. **Budget diperbarui ke Rp30.000/hari per kota → diterima.** | ✅ |
+| 2 | Budget baru: 8 × Rp30.000 = **Rp240.000/hari, Rp1.680.000/7 hari** (sebelumnya Rp50.000/hari, Rp350.000). | 8 ad set paralel, skema bergiliran **dibatalkan**. | ✅ disetujui user |
 | 3 | Poster diterima (`marketing/assets/ccss7-poster.jpg`, **900 × 1600 px, 9:16**). Tidak ada nama game, tanggal, deadline, venue, hadiah, biaya. | Fakta poster dipakai di §5 & §7. **Resolusi di bawah 1080 × 1920** → minta file master (PSD/AI/Figma), jangan upscale JPG. | ✅ / ⚠️ file master |
 | 3b | Poster as-is **gagal safe area Stories/Reels**: logo CBN fiber & FiberStar (y≈130/1600) masuk zona header atas; baris kota ke-2, "512 Teams", link registrasi, dan seluruh logo sponsor ada di zona bawah yang tertutup caption/CTA. | **Jangan upload poster mentah.** Wajib re-layout (§7). | ✅ dicek |
 | 3c | Poster menulis **"REGISTRATION IS NOW OPEN!"** tanpa tanggal & tanpa status per kota. | Klaim ini global dan bisa basi. Di varian iklan, headline ini **diganti hook kota** (§7). | ⚠️ |
@@ -41,7 +41,7 @@ Akun yang diasumsikan: **Cbn MarComm ADS (`420729605398411`, IDR, payment aktif)
 | Frequency control | Cap manual **2 impresi / 7 hari** (cek default di UI, sesuaikan) |
 | Billing | Impressions |
 | Bid strategy | Highest volume (tanpa cap) |
-| Budget | **Lifetime Rp43.750/ad set** (skema bergiliran §2) |
+| Budget | **Daily Rp30.000/ad set** (§2) |
 | Placement | Manual: Facebook Feed, Instagram Feed, Instagram Profile Feed, Instagram Explore, Facebook Stories, Instagram Stories. Reels **OFF** sampai ada aset video. Audience Network, Messenger, right column, search, in-stream **OFF**. |
 | Audience | §3 |
 
@@ -49,39 +49,28 @@ Akun yang diasumsikan: **Cbn MarComm ADS (`420729605398411`, IDR, payment aktif)
 
 ## 2. Budget & Jadwal
 
-### 2a. Kenapa rencana awal tidak bisa jalan
-8 × Rp6.250 = Rp50.000/hari, tetapi tiap ad set wajib ≥ Rp17.825/hari. Ads Manager akan menolak saat Publish.
+### 2a. Budget disetujui: Rp30.000/hari per kota (update 1 Okt 2026)
+| | Nilai |
+|---|---|
+| Per ad set | **Daily Rp30.000** (≥ minimum akun Rp17.825 ✅ — diterima) |
+| Per hari, 8 ad set | **Rp240.000** |
+| 7 hari | **Rp1.680.000** di luar pajak |
+| Struktur | **8 ad set jalan paralel**, tidak perlu bergiliran |
 
-### 2b. Rekomendasi: 2 jalur bergiliran, lifetime budget (🔧 tetap Rp350.000, tetap 8 ad set)
+⚠️ Ini **menggantikan** batas lama Rp50.000/hari & Rp350.000 total. Pastikan approval keuangan mengikuti angka baru (Rp1.680.000 + pajak), bukan angka lama.
 
-- 7 hari × 2 slot paralel = 14 "ad-set-hari" ÷ 8 ad set = **1,75 hari (42 jam) per kota**.
-- Tiap ad set: **lifetime Rp43.750**, flight 42 jam → rata-rata Rp25.000/hari (≥ minimum; walau dibulatkan 2 hari, min lifetime 2 × 17.825 = 35.650 tetap aman).
-- Total: 8 × 43.750 = **Rp350.000** (di luar pajak). Paralel maksimal 2 × 25.000 = **Rp50.000/hari**.
-- Lifetime budget dipilih karena Meta **tidak akan melewati total lifetime** per ad set, dan jam mulai/selesai bisa diset presisi — tidak perlu on/off manual.
+### 2b. Jadwal per kota
+- Start semua ad set: D1 (⚠️ tetapkan setelah jadwal kota terkonfirmasi).
+- **End date tiap ad set = min(D7, deadline pendaftaran kota tsb)**. Kota yang deadline-nya lebih awal otomatis berhenti — spend total turun, tidak dipindah ke kota lain tanpa persetujuan.
+- Kota yang pendaftarannya sudah tutup sebelum D1 → jangan dibuat / tetap paused.
 
-**Aturan urutan:** urutkan kota dari **deadline pendaftaran paling awal**. Kota ke-1 → Jalur A slot 1, ke-2 → Jalur B slot 1, ke-3 → Jalur A slot 2, dst. Slot sebuah kota **harus selesai sebelum deadline kota itu**; kalau tidak, tukar slot. Kota yang pendaftarannya sudah tutup → keluarkan, realokasi ke kota lain (bukan tambah budget).
-
-Template (D1 = tanggal mulai, ⚠️ tetapkan setelah jadwal kota terkonfirmasi; WIB):
-
-| Slot | Waktu | Jalur A | Jalur B |
-|---|---|---|---|
-| 1 | D1 00:00 → D2 18:00 | Kota urutan deadline #1 | #2 |
-| 2 | D2 18:00 → D4 12:00 | #3 | #4 |
-| 3 | D4 12:00 → D6 06:00 | #5 | #6 |
-| 4 | D6 06:00 → D8 00:00 | #7 | #8 |
-
-Placeholder sampai deadline diketahui: A = AS01 Jakarta, AS03 Bandung, AS05 Yogyakarta, AS07 Malang; B = AS02 Sukabumi, AS04 Semarang, AS06 Surabaya, AS08 Cirebon.
-
-### 2c. Alternatif B (kalau wajib daily budget)
-Rp25.000/hari per ad set, 2 aktif bersamaan, on/off manual sesuai tabel di atas. Lebih berisiko (lupa switch = overspend jalur). Tidak direkomendasikan.
-
-### 2d. Fakta soal daily budget
-- **Daily budget = rata-rata, bukan plafon mutlak.** Meta boleh belanja hingga **75% di atas** daily budget pada hari tertentu, dengan jaminan total satu minggu kalender tidak melebihi 7 × daily budget.
-- Lifetime budget: pengeluaran harian bisa naik-turun mengikuti peluang, tetapi **total tidak melebihi lifetime**.
+### 2c. Fakta soal daily budget
+- **Daily budget = rata-rata, bukan plafon mutlak.** Meta boleh belanja hingga **75% di atas** daily budget pada hari tertentu (maks ±Rp52.500/ad set/hari), dengan jaminan total satu minggu kalender (Minggu–Sabtu) tidak melebihi 7 × daily budget (Rp210.000/ad set).
+- Butuh plafon keras per kota? Pakai **lifetime Rp210.000/ad set** (30.000 × 7) — total tidak akan terlewati; pengeluaran harian tetap boleh naik-turun.
 - Pajak (PPN) ditagih di luar angka di atas.
 
-### 2e. Kejujuran soal skala
-Rp43.750 per kota selama 42 jam adalah tes kecil. Ekspektasikan delivery tidak stabil dan "Learning" tidak selesai — wajar untuk Reach di budget ini. Kalau tujuan bisnisnya awareness yang terasa di tiap kota, opsi yang perlu **persetujuan Anda** (tidak saya terapkan): (a) perpanjang ke 14 hari tetap Rp50.000/hari → 3,5 hari/kota, total Rp700.000; atau (b) fokus ke 4 kota dengan deadline terdekat dulu.
+### 2d. Catatan kejujuran
+Rp30.000/hari untuk Reach di **kota kecil** (Sukabumi, Cirebon, Yogyakarta) berpotensi menjangkau sebagian besar audiens 18–34 yang tersedia dalam beberapa hari → frequency naik, cost per 1.000 reached memburuk. Pantau Hari 3–4 (§8); kalau frequency > 3, turunkan budget kota tsb (perlu persetujuan) daripada membakar impresi ke orang yang sama.
 
 ---
 
@@ -121,17 +110,17 @@ Pin radius minimum 1 km. Lingkaran tidak mengikuti batas administratif — fallb
 
 ## 4. Tabel 8 Ad Set
 
-| Ad set | Lokasi | Usia | Lifetime | Flight (placeholder) | Iklan |
+| Ad set | Lokasi | Usia | Daily | Flight | Iklan |
 |---|---|---|---|---|---|
-| AS01_Jakarta | DKI Jakarta | 18–34 ⚠️ | Rp43.750 | A-1 | AD01_Jakarta_Static |
-| AS02_Sukabumi | Kota Sukabumi | 18–34 ⚠️ | Rp43.750 | B-1 | AD02_Sukabumi_Static |
-| AS03_Bandung | Kota Bandung | 18–34 ⚠️ | Rp43.750 | A-2 | AD03_Bandung_Static |
-| AS04_Semarang | Kota Semarang | 18–34 ⚠️ | Rp43.750 | B-2 | AD04_Semarang_Static |
-| AS05_Yogyakarta | Kota Yogyakarta | 18–34 ⚠️ | Rp43.750 | A-3 | AD05_Yogyakarta_Static |
-| AS06_Surabaya | Kota Surabaya | 18–34 ⚠️ | Rp43.750 | B-3 | AD06_Surabaya_Static |
-| AS07_Malang | Kota Malang | 18–34 ⚠️ | Rp43.750 | A-4 | AD07_Malang_Static |
-| AS08_Cirebon | Kota Cirebon | 18–34 ⚠️ | Rp43.750 | B-4 | AD08_Cirebon_Static |
-| **Total** | | | **Rp350.000** | | |
+| AS01_Jakarta | DKI Jakarta | 18–34 ⚠️ | Rp30.000 | D1 → min(D7, deadline) ⚠️ | AD01_Jakarta_Static |
+| AS02_Sukabumi | Kota Sukabumi | 18–34 ⚠️ | Rp30.000 | D1 → min(D7, deadline) ⚠️ | AD02_Sukabumi_Static |
+| AS03_Bandung | Kota Bandung | 18–34 ⚠️ | Rp30.000 | D1 → min(D7, deadline) ⚠️ | AD03_Bandung_Static |
+| AS04_Semarang | Kota Semarang | 18–34 ⚠️ | Rp30.000 | D1 → min(D7, deadline) ⚠️ | AD04_Semarang_Static |
+| AS05_Yogyakarta | Kota Yogyakarta | 18–34 ⚠️ | Rp30.000 | D1 → min(D7, deadline) ⚠️ | AD05_Yogyakarta_Static |
+| AS06_Surabaya | Kota Surabaya | 18–34 ⚠️ | Rp30.000 | D1 → min(D7, deadline) ⚠️ | AD06_Surabaya_Static |
+| AS07_Malang | Kota Malang | 18–34 ⚠️ | Rp30.000 | D1 → min(D7, deadline) ⚠️ | AD07_Malang_Static |
+| AS08_Cirebon | Kota Cirebon | 18–34 ⚠️ | Rp30.000 | D1 → min(D7, deadline) ⚠️ | AD08_Cirebon_Static |
+| **Total** | | | **Rp240.000/hari · Rp1.680.000/7 hari** | | |
 
 Tiap ad: 1 iklan, format single image dengan **placement asset customization** (4:5 untuk Feed/Explore, 9:16 untuk Stories).
 
@@ -239,13 +228,13 @@ Sumber: `marketing/assets/ccss7-poster.jpg` (900 × 1600, 9:16). ⚠️ Minta fi
 Objective Awareness tidak dioptimasi untuk klik — CTR rendah adalah normal, bukan kegagalan.
 
 ### Simulasi (BUKAN janji)
-Asumsi: cost per 1.000 reached Rp5.000–15.000 (rentang asumsi, belum ada benchmark akun); spend penuh Rp350.000; tanpa tumpang tindih antar kota.
+Asumsi: cost per 1.000 reached Rp5.000–15.000 (rentang asumsi, belum ada benchmark akun); spend penuh Rp1.680.000 (Rp210.000/kota); tanpa tumpang tindih antar kota.
 
-| Skenario | Cost/1.000 reached | Reach total | Per kota (Rp43.750) |
+| Skenario | Cost/1.000 reached | Reach total | Per kota (Rp210.000) |
 |---|---|---|---|
-| Optimis | Rp5.000 | ±70.000 | ±8.750 |
-| Tengah | Rp10.000 | ±35.000 | ±4.375 |
-| Pesimis | Rp15.000 | ±23.300 | ±2.900 |
+| Optimis | Rp5.000 | ±336.000 | ±42.000 |
+| Tengah | Rp10.000 | ±168.000 | ±21.000 |
+| Pesimis | Rp15.000 | ±112.000 | ±14.000 |
 
 Kota kecil bisa jenuh lebih cepat (frequency naik) dan kota besar bisa CPM lebih tinggi karena kompetisi lelang.
 
@@ -254,7 +243,7 @@ Kota kecil bisa jenuh lebih cepat (frequency naik) dan kota besar bisa CPM lebih
 |---|---|---|
 | Sebelum D1 | Semua ⚠️ di dokumen ini tertutup; pratinjau 16 placement; URL akhir & UTM teruji | Tunda publish |
 | Hari 1–2 | Approval, delivery mulai, spend sesuai pacing, lokasi (breakdown Region), tampilan, link | Iklan ditolak → revisi & submit ulang; tidak deliver → cek audiens terlalu sempit |
-| Hari 3–4 | Cost/1.000 reached & frequency per kota yang sudah selesai | Frequency > 2,5 dalam slot 42 jam → longgarkan audiens (hapus saran minat) untuk kota berikutnya |
+| Hari 3–4 | Cost/1.000 reached & frequency per kota | Frequency > 3 → longgarkan audiens (hapus saran minat) atau usulkan turunkan budget kota tsb |
 | Setiap hari | Deadline kota | Deadline lewat → pause ad set / hapus baris "pendaftaran dibuka" |
 | Hari 7 | Laporan per kota (§9) + rekomendasi | — |
 
@@ -278,10 +267,10 @@ Ringkasan: kota paling efisien (cost/1.000 reached), kota jenuh (frequency), isu
 
 ---
 
-## 10. Rekomendasi Optimasi (dalam Rp50.000/hari)
+## 10. Rekomendasi Optimasi (dalam Rp30.000/hari per kota)
 
-1. **Jangan ubah iklan selama flight 42 jam** kecuali ditolak — setiap edit signifikan mereset learning dan memotong delivery di flight yang sudah pendek.
-2. **Realokasi, bukan tambah:** kota yang deadline-nya lewat sebelum slotnya → keluarkan, lifetime-nya dipindah ke kota dengan cost/1.000 reached terbaik yang masih buka.
+1. **Jangan ubah iklan/budget di 3 hari pertama** kecuali ditolak — edit signifikan mereset learning.
+2. **Realokasi, bukan tambah:** kota yang jenuh atau deadline-nya lewat → turunkan/hentikan; sisa budget boleh dipindah ke kota dengan cost/1.000 reached terbaik **setelah disetujui**.
 3. **Kota kecil jenuh** (frequency tinggi) → putaran berikutnya pakai audiens luas (lokasi + usia minimum saja).
 4. **Putaran berikutnya** kalau ada data registrasi per kota: alihkan ke objective Traffic/Leads untuk kota dengan pendaftar terendah — Awareness tidak mengoptimasi pendaftaran.
 5. Aset video 9:16 (5–15 detik) → aktifkan Reels; biasanya menambah inventori murah.
@@ -294,7 +283,8 @@ Ringkasan: kota paling efisien (cost/1.000 reached), kota jenuh (frequency), isu
 - [ ] Akun iklan, Page FB & akun IG CBN dikonfirmasi
 - [ ] Nama game ⚠️ · jadwal & deadline per kota ⚠️ · persyaratan peserta (usia) ⚠️ · status pendaftaran per kota ⚠️
 - [ ] URL akhir bit.ly & retensi UTM diuji; pixel di landing (opsional)
-- [ ] Tanggal D1 ditetapkan; urutan slot disusun dari deadline
+- [ ] Tanggal D1 ditetapkan; end date tiap kota = min(D7, deadline kota)
+- [ ] Approval budget Rp1.680.000 + pajak
 - [ ] Brand guideline CBN Fiber / FiberStar / partner dicek
 - [ ] Campaign, 8 ad set, 8 ad dibuat dalam status **draft/paused** → review → baru Publish
 
@@ -305,10 +295,10 @@ Ringkasan: kota paling efisien (cost/1.000 reached), kota jenuh (frequency), isu
 ```
 CCSS7 Meta Ads (draft, belum dibuat di Ads Manager)
 ├─ Akun: Cbn MarComm ADS 420729605398411 (IDR) ⚠️ konfirmasi
-│   └─ min daily budget Rp17.825/ad set ──► Rp6.250 DITOLAK ──► 2 jalur bergiliran
+│   └─ min daily budget Rp17.825/ad set ──► Rp6.250 ditolak ──► user set Rp30.000/kota/hari ✅
 ├─ Campaign CBN_CCSS7_Awareness_8Kota · Awareness · CBO OFF
-│   └─ 8 ad set · Maximize reach · lifetime Rp43.750 · flight 42 jam · total Rp350.000
-│       ├─ urutan slot = deadline pendaftaran (⚠️ belum ada)
+│   └─ 8 ad set paralel · Maximize reach · daily Rp30.000 · Rp240.000/hari · Rp1.680.000/7 hari
+│       ├─ end date = min(D7, deadline kota) (⚠️ deadline belum ada)
 │       ├─ lokasi: City entry tanpa radius; DKI = region; Kota Yogyakarta ≠ DIY
 │       └─ audiens: Advantage+ (keras: lokasi + usia min 18; saran: 18–34, esports, video games)
 ├─ Ad: 1/ad set · single image · 4:5 + 9:16 · CTA LEARN_MORE · Reels OFF
