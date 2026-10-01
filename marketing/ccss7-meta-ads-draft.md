@@ -11,7 +11,9 @@ Legenda: ✅ terverifikasi · ⚠️ BELUM TERKONFIRMASI (wajib cek sebelum publ
 |---|---|---|---|
 | 1 | **Minimum daily budget akun IDR = Rp17.825/ad set/hari** (dibaca dari API Meta pada semua akun IDR, termasuk *Cbn MarComm ADS* `420729605398411`). | **Rp6.250/ad set ditolak.** 8 ad set paralel butuh min. Rp142.600/hari. | ✅ |
 | 2 | Dengan batas Rp50.000/hari, maksimum **2 ad set** bisa jalan bersamaan (2 × 17.825 = 35.650; 3 × 17.825 = 53.475 > 50.000). | Struktur wajib **bergiliran** → lihat §2. Budget tidak dinaikkan. | ✅ |
-| 3 | File poster **tidak terlampir** di sesi ini. | Semua fakta materi hanya dari brief: nama event, 8 kota, `bit.ly/CCSS7`, "512 Teams", logo CBN Fiber/FiberStar/partner. Visual brief ditulis tanpa melihat poster. | ⚠️ kirim ulang poster |
+| 3 | Poster diterima (`marketing/assets/ccss7-poster.jpg`, **900 × 1600 px, 9:16**). Tidak ada nama game, tanggal, deadline, venue, hadiah, biaya. | Fakta poster dipakai di §5 & §7. **Resolusi di bawah 1080 × 1920** → minta file master (PSD/AI/Figma), jangan upscale JPG. | ✅ / ⚠️ file master |
+| 3b | Poster as-is **gagal safe area Stories/Reels**: logo CBN fiber & FiberStar (y≈130/1600) masuk zona header atas; baris kota ke-2, "512 Teams", link registrasi, dan seluruh logo sponsor ada di zona bawah yang tertutup caption/CTA. | **Jangan upload poster mentah.** Wajib re-layout (§7). | ✅ dicek |
+| 3c | Poster menulis **"REGISTRATION IS NOW OPEN!"** tanpa tanggal & tanpa status per kota. | Klaim ini global dan bisa basi. Di varian iklan, headline ini **diganti hook kota** (§7). | ⚠️ |
 | 4 | Redirect `bit.ly/CCSS7` tidak bisa dicek dari lingkungan ini (proxy 403). Tujuan akhir & terbawanya UTM belum diketahui. | Lihat §6. | ⚠️ |
 | 5 | Nama game, jadwal, deadline, persyaratan peserta, venue, hadiah, biaya, status pendaftaran per kota **tidak ada di brief**. | Copy ditulis tanpa klaim tsb. Kalimat "pendaftaran dibuka" disediakan sebagai baris opsional terkunci. | ⚠️ |
 
@@ -140,6 +142,7 @@ Tiap ad: 1 iklan, format single image dengan **placement asset customization** (
 Aturan bersama:
 - CTA: **Pelajari Selengkapnya** (`LEARN_MORE`).
 - Tidak menyebut game, hadiah, venue, jadwal, biaya, kuota. "512 Teams" **tidak** dipakai di copy (rawan dibaca kuota kota).
+- Klaim yang **bersumber dari poster** dan boleh dipakai: "8 kota di Pulau Jawa" (*8 Cities in Java*), "kesempatan menangin battle di kotamu" (*the chance to win the battle in your city*), "didukung DensPlay, Pasar Games, CubMu, dll." (*Supported by*). Opsional baris kedua primary text: `8 kota di Jawa, kesempatan menangin battle di kotamu sendiri.`
 - 🔒 **Baris opsional** — tambahkan di akhir primary text **hanya jika** status pendaftaran kota tsb sudah dikonfirmasi aktif & deadline belum lewat:
   `Pendaftaran [Kota] sudah dibuka — daftarkan timmu sebelum ditutup!`
 
@@ -191,32 +194,41 @@ utm_source={{site_source_name}}&utm_medium=paid_social&utm_campaign=ccss7_awaren
 
 ## 7. Brief Adaptasi Visual
 
-Sumber: poster CCSS7 ⚠️ (belum diterima — brief ini dikunci ke elemen yang disebut di brief saja).
+Sumber: `marketing/assets/ccss7-poster.jpg` (900 × 1600, 9:16). ⚠️ Minta file master untuk produksi.
 
-**Prinsip:** satu master layout, 8 varian kota. Yang berubah hanya **nama kota**.
+### 7a. Inventaris elemen poster (urutan atas → bawah)
+| # | Elemen | Posisi (px pada 1600) | Dipakai di iklan? |
+|---|---|---|---|
+| 1 | Logo **CBN fiber** (kiri atas) | y ≈ 105–150 | ✅ wajib |
+| 2 | Logo **FiberStar — Connecting Indonesia** (kanan atas) | y ≈ 105–155 | ✅ wajib |
+| 3 | "REGISTRATION IS NOW OPEN!" (emas) | y ≈ 195–470 | ❌ **diganti** hook kota (lihat 7b) |
+| 4 | Logo **CBN Championship Series Season 7** (perisai) | y ≈ 520–880 | ✅ key visual |
+| 5 | "< 8 Cities in Java >" + 8 chip kota | y ≈ 915–1090 | ✅ chip kota aktif di-*highlight* |
+| 6 | "512 Teams and the chance to Win the battle in your city!" | y ≈ 1115–1210 | ✅ utuh, **tidak dipisah** "512 Teams"-nya |
+| 7 | "Registrasi link bit.ly/CCSS7" | y ≈ 1240–1300 | ✅ |
+| 8 | Supported by: DensPlay, Pasar Games, CubMu (by Transvision), Ruijie \| Cybrey, AFCWAVE, DITUSI | y ≈ 1435–1555 | ✅ wajib, urutan & ukuran sesuai poster |
+| 9 | Background biru neon + siluet kota | full | ✅ |
 
-| Elemen | Aturan |
-|---|---|
-| Nama kota | Elemen terbesar kedua setelah logo CCSS7. Format: "BANDUNG, SIAPKAN TIM TERBAIKMU!" atau nama kota besar + tagline kecil. |
-| Logo CCSS7 / nama event | Wajib terbaca di thumbnail. |
-| CBN Fiber | Wajib, sesuai brand guideline (clear space, warna, tidak di-stretch/recolor) ⚠️ minta guideline. |
-| FiberStar & partner | Pertahankan seperti di poster, urutan & ukuran sesuai ketentuan brand. |
-| `bit.ly/CCSS7` | Boleh tetap di visual (konsisten dengan poster). |
-| "512 Teams" | Jika dipertahankan, **jangan diletakkan bersebelahan dengan nama kota** (agar tidak terbaca sebagai kuota kota). Opsi aman: hapus dari varian iklan. |
-| Larangan | Tidak menambah nama game, hadiah, tanggal, venue, biaya, kuota yang tidak ada di poster. Tidak memakai "Pendaftaran dibuka" di gambar (gambar tidak bisa diubah per status seperti copy). |
-| Teks | Seminim mungkin; info detail di copy & landing page. |
+### 7b. Perubahan per kota (yang berubah HANYA ini)
+1. **Headline emas (#3) diganti:** baris 1 kecil = `<KOTA>,` · baris 2 besar = `SIAPKAN TIM TERBAIKMU!` — gaya font & gradasi emas sama dengan "IS NOW OPEN!". Hasilnya nama kota jadi elemen teks paling menonjol tanpa menambah elemen baru.
+2. **Chip kota (#5):** chip kota target diberi warna emas + sedikit lebih besar; 7 chip lain tetap biru. Menegaskan "kotamu" sekaligus menunjukkan skala 8 kota.
+3. Jika status pendaftaran kota **terkonfirmasi aktif**: boleh tambah label kecil `REGISTRATION OPEN` di atas headline. Jika belum: tanpa label.
+4. "512 Teams…" (#6) tetap satu kalimat utuh seperti poster dan **tidak** diletakkan menempel pada headline kota — supaya tidak terbaca "512 tim di <kota>".
 
-**Spesifikasi:**
+### 7c. Layout per format
+| Format | Ukuran | Safe area | Penyesuaian dari poster |
+|---|---|---|---|
+| **Stories 9:16** | 1080 × 1920 | Kosongkan **atas 270 px**, **bawah 670 px**, sisi 65 px (aman untuk Stories & Reels) | Poster as-is gagal. Turunkan logo CBN fiber/FiberStar ke y ≈ 290–360. Padatkan vertikal: perisai CCSS7 diperkecil ±20%, jarak antar blok dikurangi, sehingga #3–#7 muat di y 290–1250. Logo sponsor (#8) **boleh** di zona bawah (ditimpa UI tidak fatal) — atau pindahkan ke strip tipis di y ≈ 1180–1250 jika brand mewajibkan selalu terlihat ⚠️ konfirmasi brand. |
+| **Feed 4:5** | 1080 × 1350 | margin ≥ 60 px | Re-layout total (rasio lebih pendek): baris atas logo CBN fiber · FiberStar → headline kota → perisai CCSS7 (± 45% tinggi) → chip 8 kota (2 baris) → "512 Teams…" + link (1 blok) → strip sponsor bawah. |
+| Reels | — | — | OFF sampai ada video. |
 
-| Format | Ukuran | Safe area |
-|---|---|---|
-| Feed 4:5 | 1080 × 1350 px | margin ≥ 60 px tiap sisi untuk logo & teks. |
-| Stories 9:16 | 1080 × 1920 px | Kosongkan teks/logo di **atas 270 px** dan **bawah 670 px**, sisi **65 px** (aman juga untuk Reels kalau nanti dipakai). Konten penting di area tengah 1080 × ~980 px. |
-| Reels | — | Hanya jika ada aset video vertikal 9:16; belum ada → placement OFF. |
+### 7d. Aturan brand & larangan
+- Logo CBN fiber, FiberStar, dan semua sponsor: tidak di-stretch, recolor, atau dipotong; clear space sesuai guideline ⚠️ minta guideline resmi.
+- Tidak menambah nama game, hadiah, tanggal, venue, biaya, kuota.
+- Bahasa: poster campur EN/ID ("Registrasi link") — pertahankan, headline kota dalam bahasa Indonesia.
 
-Format file: PNG/JPG sRGB, < 30 MB. Penamaan: `CCSS7_AS03_Bandung_Feed_1080x1350.png`, `CCSS7_AS03_Bandung_Story_1080x1920.png` (16 file total).
-
-QA sebelum upload: cek pratinjau di Ads Manager untuk IG Stories & FB Stories (nama kota & logo tidak tertutup header profil / tombol CTA).
+### 7e. Output
+16 file PNG/JPG sRGB: `CCSS7_AS03_Bandung_Feed_1080x1350.png`, `CCSS7_AS03_Bandung_Story_1080x1920.png`, dst. QA: pratinjau IG Stories & FB Stories di Ads Manager — logo atas & headline kota tidak tertutup header profil; link tidak tertutup tombol CTA.
 
 ---
 
@@ -278,7 +290,7 @@ Ringkasan: kota paling efisien (cost/1.000 reached), kota jenuh (frequency), isu
 
 ## 11. Checklist Sebelum Publish (semua harus ✅)
 
-- [ ] Poster final diterima; visual 16 file selesai & lolos safe area
+- [x] Poster diterima · [ ] file master (≥1080×1920) · [ ] 16 visual re-layout lolos safe area
 - [ ] Akun iklan, Page FB & akun IG CBN dikonfirmasi
 - [ ] Nama game ⚠️ · jadwal & deadline per kota ⚠️ · persyaratan peserta (usia) ⚠️ · status pendaftaran per kota ⚠️
 - [ ] URL akhir bit.ly & retensi UTM diuji; pixel di landing (opsional)
@@ -303,5 +315,6 @@ CCSS7 Meta Ads (draft, belum dibuat di Ads Manager)
 ├─ Copy: hook "<Kota>, Siapkan Tim Terbaikmu!" · tanpa game/hadiah/kuota · baris "pendaftaran dibuka" terkunci
 ├─ URL: bit.ly/CCSS7 ⚠️ redirect & UTM belum teruji → pakai URL akhir
 │   └─ utm_term=<kota> · utm_source={{site_source_name}} · utm_content={{placement}}
-└─ Terbuka: poster, game, jadwal, deadline, syarat peserta, status per kota, brand guideline
+├─ Poster: marketing/assets/ccss7-poster.jpg (900×1600) · gagal safe area Stories → re-layout · headline "IS NOW OPEN!" diganti hook kota
+└─ Terbuka: file master poster, game, jadwal, deadline, syarat peserta, status per kota, brand guideline
 ```
