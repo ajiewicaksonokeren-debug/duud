@@ -290,6 +290,24 @@ Ringkasan: kota paling efisien (cost/1.000 reached), kota jenuh (frequency), isu
 
 ---
 
+## 13. Status di Ads Manager (1 Okt 2026)
+
+Akun **Cbn MarComm ADS `420729605398411`** — semua objek berstatus **DRAFT (belum dipublikasikan, Rp0 terpakai)**.
+
+| Objek | ID | Status |
+|---|---|---|
+| Campaign `CBN_CCSS7_Awareness_8Kota` · Awareness · ABO | 120253680112700785 | Draft |
+| AS01_Jakarta | 120253680119150785 | Draft |
+| AS02_Sukabumi | 120253680176550785 | Draft |
+| AS03_Bandung | 120253680176820785 | Draft |
+| AS04_Semarang | 120253680177730785 | Draft |
+| AS05_Yogyakarta | — | **Belum dibuat** (pembuatan diblokir izin sesi) |
+| AS06_Surabaya | 120253680179230785 | Draft |
+| AS07_Malang | 120253680179460785 | Draft |
+| AS08_Cirebon | — | **Belum dibuat** (pembuatan diblokir izin sesi) |
+
+Setting tiap ad set: Reach · Rp30.000/hari · 1 Okt 12:00 → **7 Okt 23:59 WIB (placeholder, ⚠️ ganti per deadline kota)** · cap 2 impresi/7 hari · Advantage+ audience (saran usia 18–34; usia minimum keras belum di-set eksplisit → cek di UI) · FB Feed/Stories + IG Feed/Profile/Explore/Stories · lokasi **pin + radius** (§3c fallback) karena ID lokasi "City" tidak tersedia lewat API sesi ini → **ganti ke entri City/Region di UI**. Minat esports/video games belum ditambahkan (ID minat tidak tersedia).
+
 ## 12. Knowledge Graph
 
 ```
@@ -301,6 +319,7 @@ CCSS7 Meta Ads (draft, belum dibuat di Ads Manager)
 │       ├─ end date = min(D7, deadline kota) (⚠️ deadline belum ada)
 │       ├─ lokasi: City entry tanpa radius; DKI = region; Kota Yogyakarta ≠ DIY
 │       └─ audiens: Advantage+ (keras: lokasi + usia min 18; saran: 18–34, esports, video games)
+├─ Ads Manager: campaign 120253680112700785 + 6/8 ad set DRAFT (Yogya & Cirebon belum) · lihat §13
 ├─ Ad: 1/ad set · single image · 4:5 + 9:16 · CTA LEARN_MORE · Reels OFF
 ├─ Copy: hook "<Kota>, Siapkan Tim Terbaikmu!" · tanpa game/hadiah/kuota · baris "pendaftaran dibuka" terkunci
 ├─ URL: bit.ly/CCSS7 ⚠️ redirect & UTM belum teruji → pakai URL akhir
