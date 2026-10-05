@@ -1,0 +1,38 @@
+project_id,project_name,provinsi,kota,kecamatan,kelurahan,partner,homepass,lat,lng,spread_p95_km,spread_max_km,koordinat_outlier_dibuang
+P2602217,FBECRD SGR PERUM GARDEN VILLA RESIDENCE TK,Bali,Kab. Buleleng,Buleleng,Penarukan,FiberStar,90,-8.109846,115.114527,0.12,0.14,0
+P2504552,FBEOPA SRP DESA SAMPALAN TENGAH TK,Bali,Kab. Klungkung,Dawan,Sampalan Tengah,FiberStar,92,-8.539794,115.415917,0.28,0.3,0
+P2602213,FBERUK TGR CALICO GRANDE PARAMOUNT PETALS,Banten,Kab. Tangerang,Curug,Cukang Galih,FiberStar,66,-6.250785,106.559365,0.08,0.09,0
+P2602023,FBEOPA  CPT CIREUNDEU RW 05 TK,Banten,Kota Tangerang Selatan,Ciputat Timur,Cireundeu,CBN,272,-6.313848,106.76384,0.29,0.31,0
+P2504201,FBEOPA KYB GANDARIA SELATAN RW 02 TK,Dki Jakarta,Kota Jakarta Selatan,Cilandak,Gandaria Selatan,CBN,225,-6.265918,106.792692,0.48,0.55,0
+P2504164,FBEOPA SMG Kedungmundu RW 03 TK,JAWA TENGAH,Kota Semarang,Tembalang,Kedungmundu,CBN,443,-7.019045,110.46734,0.34,0.46,0
+P2503271,FBEOPA SOR DESA SEKARWANGI TK,Jawa Barat,Kab. Bandung,Soreang,Sekarwangi,FiberStar,362,-7.016341,107.540431,0.6,0.7,0
+P2504761,"FBEOPA NPH CIBURUY RW 07,08,13,14 TK",Jawa Barat,Kab. Bandung Barat,Padalarang,Ciburuy,FiberStar,237,-6.829367,107.462608,0.42,0.48,0
+P2503695,FBEOPA SMG Petompon RW 05 TK,Jawa Tengah,Kota Semarang,Gajahmungkur,Petompon,CBN,390,-7.004045,110.400201,0.5,0.58,0
+P2504084,FBEOPA SMG Petompon RW 03 TK,Jawa Tengah,Kota Semarang,Gajahmungkur,Petompon,CBN,162,-6.998513,110.403104,0.14,0.17,0
+P2600421,"FBECRD SMG TAMAN MAJAPAHIT ESTATE RW 06 RT 02, 03 TK",Jawa Tengah,Kota Semarang,Pedurungan,Pedurungan Lor,FiberStar,214,-7.011511,110.484358,0.25,0.3,0
+P2600416,"FBEOPA SKT DANUKUSUMAN RW 04,07,09,10 TK",Jawa Tengah,Kota Surakarta,Serengan,Danukusuman,FiberStar,322,-7.585,110.822731,0.32,0.79,0
+P2600492,"FBEOPA SKT PASAR KLIWON RW 01,02,03,06,07,10,11,12 TK",Jawa Tengah,Kota Surakarta,Pasar Kliwon,Pasar Kliwon,FiberStar,457,-7.580844,110.831807,0.46,1.0,0
+P2600633,FBEOPA SKT MANAHAN RW 04 TK,Jawa Tengah,Kota Surakarta,Banjarsari,Manahan,FiberStar,109,-7.553505,110.811202,0.13,0.15,0
+P2600176,FBECRD GSK PERUM DE NAILA GARDEN TK,Jawa Timur,Kab. Gresik,Driyorejo,Sumput,FiberStar,277,-7.343015,112.593764,0.1,0.13,0
+P2600177,FBECRD GSK PERUM DE NAILA PARK TK,Jawa Timur,Kab. Gresik,Menganti,Menganti,FiberStar,593,-7.315017,112.583628,0.22,0.79,0
+P2503527,FBEOPA KPN BULULAWANG TK,Jawa Timur,Kab. Malang,Bululawang,Bululawang,FiberStar,800,-8.078394,112.645824,0.85,1.46,0
+P2600618,FBEOPA KPN TIRTOMOYO SEGMENT 1 TK,Jawa Timur,Kab. Malang,Pakis,Tirtomoyo,FiberStar,362,-7.933089,112.671541,0.64,0.73,0
+P2600822,FBECRD SDA GRIYA BHAYANGKARA RW. 08 TK,Jawa Timur,Kab. Sidoarjo,Sukodono,Masangan Kulon,FiberStar,442,-7.376365,112.689611,0.43,0.47,0
+P2600824,FBECRD SDA GRIYA BHAYANGKARA RW. 10 TK,Jawa Timur,Kab. Sidoarjo,Sukodono,Masangan Kulon,FiberStar,391,-7.377284,112.687941,0.25,0.31,0
+P2600729,FBEOPA BTU TORONGREJO DUSUN TUTUP TK,Jawa Timur,Kota Batu,Junrejo,Torongrejo,FiberStar,439,-7.888375,112.559519,0.44,0.5,0
+P2600939,FBEOPA PBL KANIGARAN RW.11 TK,Jawa Timur,Kota Probolinggo,Kanigaran,Kanigaran,FiberStar,130,-7.762471,113.215288,0.13,0.15,0
+P2600940,FBEOPA PBL KANIGARAN RW.03 TK,Jawa Timur,Kota Probolinggo,Kanigaran,Kanigaran,FiberStar,111,-7.762938,113.216714,0.19,0.22,0
+P2600712,FBECRD SBY GALAXY BUMI PERMAI RW.09 TK,Jawa Timur,Kota Surabaya,Sukolilo,Medokan Semampir,FiberStar,758,-7.304695,112.784667,0.3,0.36,0
+P2601553,FBEOPA SBY PLOSO RW.06 TK,Jawa Timur,Kota Surabaya,Tambaksari,Ploso,FiberStar,692,-7.253178,112.774601,0.56,0.67,0
+P2600523,FBECRD MTP SUNGAI PARING PENDIDIKAN 5 RT.06 TK,Kalimantan Selatan,Kab. Banjar,Martapura,Sungai Paring,CBN,97,-3.431053,114.853022,0.24,0.27,0
+P2400941,"FBEOPA BJM KEL. PEMURUS DALAM RW.01 RT.05,06,09",Kalimantan Selatan,Kota Banjarmasin,Banjarmasin Selatan,Pemurus Dalam,FiberStar,244,-3.348147,114.620312,0.28,0.32,0
+P2505019,FBECRD BJM SURGI MUFTI BUANA PERMAI RT.10 TK,Kalimantan Selatan,Kota Banjarmasin,Banjarmasin Utara,Surgi Mufti,CBN,259,-3.301108,114.597781,0.31,0.68,0
+P2600745,FBEOPA PBR KEL TANGKERANG TIMUR RW 03 RT 02  TK,Riau,Kota Pekanbaru,Tenayan Raya,Tangkerang Timur,CBN,296,0.493418,101.504455,0.36,0.4,0
+P2504498,FBECRD MKS KOMPLEKS UNM TK,Sulawesi Selatan,Kota Makassar,Rappocini,Tidung,FiberStar,474,-5.170422,119.439265,0.31,0.36,0
+P2504970,FBECRD MKS PESONA SUDIANG RAYA SEGMENT 2 TK,Sulawesi Selatan,Kota Makassar,Biring Kanaya,Laikang,FiberStar,613,-5.097039,119.528248,0.3,0.45,0
+P2600320,FBECRD PLG KALIDONI RT 46 GRIYA SAHABAT & GRAND MANSION TK,Sumatera Selatan,Kota Palembang,Kalidoni,Kalidoni,CBN,90,-2.955792,104.810977,0.13,0.16,0
+P2601731,FBECRD PLG SUKAMULYA RT 05 OPHELIA LAND TK,Sumatera Selatan,Kota Palembang,Sematang Borang,Suka Mulya,CBN,92,-2.921506,104.820119,0.09,0.1,0
+P2601976,FBECRD PLG BUKIT BARU RT05 PERUM PALM SRIGADING INDAH IV TK,Sumatera Selatan,Kota Palembang,Ilir Barat I,Bukit Baru,CBN,224,-2.974642,104.685667,0.12,0.13,0
+P2601254,FBECRD LBP PERUM GRAND TAMAN PERMATA INDAH,Sumatera Utara,Kab. Deli Serdang,Sunggal,Medan Krio,FiberStar,399,3.578802,98.56239,0.22,0.29,0
+P2601849,FBEOPA MDN KEL SEI SIKAMBING B LINK 7 & 15 TK,Sumatera Utara,Kota Medan,Medan Sunggal,Sei Sikambing B,FiberStar,433,3.584986,98.627849,0.59,0.7,13
+P2602053,FBECRD MDN PERUM. GRIYA PESONA MINIMALIS TK,Sumatera Utara,Kota Medan,Medan Marelan,Terjun,FiberStar,219,3.710706,98.636316,0.22,0.27,0
