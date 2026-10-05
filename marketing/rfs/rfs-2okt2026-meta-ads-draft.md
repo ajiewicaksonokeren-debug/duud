@@ -19,5 +19,5 @@ Acuan (disalin): `Meta_CBN_Consumer_Awareness_RFS week 3 sept-okt` (`12025362179
 ## Wajib dicek sebelum publish
 1. **Start 2 Okt sudah lewat** — iklan baru jalan saat publish. Periode efektif ±28 hari → estimasi spend ±Rp840.000 + PPN (bukan Rp930.000 untuk 31 hari).
 2. Campaign acuan **masih ACTIVE sampai 25 Okt** (Rp30.000/hari). Kalau dua-duanya jalan: Rp60.000/hari total sampai 25 Okt. Matikan/biarkan = keputusan user.
-3. Titik berdekatan (radius tumpang tindih, tidak dobel biaya): Petompon RW03/RW05, Kanigaran RW03/RW11, Griya Bhayangkara RW08/RW10, De Naila Garden/Park.
+3. Titik berdekatan (radius tumpang tindih, tidak dobel biaya): Petompon RW03/RW05, Kanigaran RW03/RW11, Griya Bhayangkara RW08/RW10.
 4. Creative generik (template katalog, CTA Sign Up → `cbn.id/id/applink`), tidak menyebut area — aman dipakai ulang.
