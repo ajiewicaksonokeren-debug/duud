@@ -139,4 +139,5 @@ Backend deploy: render.yaml (Docker, SQLite on disk)
 - ms/clean untuk isi tangki Rush dilaporkan client (bisa dipalsu) → uang dilindungi oleh timer server di /api/rush
 - Rush /start: SELECT semua soal ORDER BY RANDOM() lalu filter di JS → lambat kalau bank soal ribuan
 - Tidak ada test suite; tidak ada rate limit di /auth/login
+- CORS origin * (express + socket.io), tanpa security headers (helmet), tanpa body size limit eksplisit
 ```
