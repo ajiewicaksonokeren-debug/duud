@@ -71,11 +71,16 @@ export default function ClaimPublic() {
             <form onSubmit={handleSubmit}>
               <div className="field">
                 <label>Nama Lengkap</label>
-                <input value={form.nama} onChange={(e) => setForm({ ...form, nama: e.target.value })} required />
+                <input autoComplete="name" value={form.nama} onChange={(e) => setForm({ ...form, nama: e.target.value })} required />
               </div>
               <div className="field">
                 <label>{claim.prizeType === 'cash' ? 'Nomor e-wallet (DANA / OVO / GoPay)' : 'ID Game / Username Esports'}</label>
-                <input value={form.idGame} onChange={(e) => setForm({ ...form, idGame: e.target.value })} required />
+                <input
+                  {...(claim.prizeType === 'cash' && { type: 'tel', inputMode: 'numeric', autoComplete: 'tel' })}
+                  value={form.idGame}
+                  onChange={(e) => setForm({ ...form, idGame: e.target.value })}
+                  required
+                />
               </div>
               <div className="field">
                 <label>Kontak (WhatsApp/Email)</label>

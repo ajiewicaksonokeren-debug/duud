@@ -18,15 +18,8 @@ The user reviews results; they do not ask for fixes. Every change goes through t
    - Server: `node --check <changed .js>`; for route changes, boot (`cd server && npm ci && PORT=4999 DB_PATH=$SCRATCH/t.sqlite node src/index.js &`) and `curl` the changed endpoint, then kill it.
    - Client: `cd client && npm ci` (once per session) then `npx vite build`.
    - Behavior change → exercise it once (curl or the `run` skill), not only compile.
-   - UI change → screenshot it with Playwright (Chromium at `/opt/pw-browsers`) at 360, 768 and 1440 px wide and look at every shot.
-3. **Implicit requirements** — a senior would ship these without being told. Missing one = a finding:
-   - UI/page: responsive 360→1440 with no horizontal scroll; touch targets ≥44px; readable text (≥14px body, contrast AA);
-     loading, empty and error states; images sized (no layout shift) with alt text; keyboard focus visible; real links/buttons, not clickable divs;
-     uses existing tokens in `client/src/styles.css`, no new one-off colors/fonts.
-   - Landing page: plus `<title>` + meta description + OG tags, one clear CTA above the fold, fast first paint (no blocking heavy libs, lazy below-fold images).
-   - API/route: validate `req.body`, correct auth middleware, 4xx with Indonesian message, no secrets/answers in responses.
-   - Data: migration is idempotent (`IF NOT EXISTS` / column check like `rush_meter`), existing rows keep working.
-   - Forms: disabled while submitting, no double submit, server-side validation too.
+   - UI change → screenshot it with Playwright (Chromium at `/opt/pw-browsers`) at the widths listed in `ajie-manta` and look at every shot.
+3. **Defaults** — check the change against every applicable rule in the `ajie-manta` skill (sizes, breakpoints, states, a11y, perf, SEO, API, locale). Missing one = a finding.
 4. **Fix** everything found that is inside the task's scope. No permission needed. Repeat 1–3 until clean.
 5. **Graph** — apply the `knowledge-graph` skill if any fact changed.
 6. **Report** — only: what changed, what self-review caught and fixed, verification evidence (command + result), and anything left open.
