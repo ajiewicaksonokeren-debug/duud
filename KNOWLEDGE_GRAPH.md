@@ -42,3 +42,18 @@ Mobile deploy
 Backend deploy: render.yaml (Docker, SQLite on disk)
       ⚠ plan: free + disk — Render free instances don't support persistent disks
 ```
+
+## Claude skills (project-level, `.claude/skills/`)
+
+Source: github.com/alirezarezvani/claude-skills (copied as-is, not part of the app)
+```
+Finance
+├─ financial-analyst            ratios, DCF, budgeting, forecasting (python scripts)
+├─ finance-skills               finance domain index/router
+├─ saas-metrics-coach           ARR/MRR, churn, CAC, LTV, NRR
+├─ stock-analysis               equity analysis + sector references
+├─ business-investment-advisor  ROI/NPV/IRR for business investments
+├─ cfo-advisor                  (from c-level-advisor) runway, fundraising, planning
+└─ research-finance             (from research-ops) R&D program finance
+Update: re-clone repo, re-copy the folders above.
+```
