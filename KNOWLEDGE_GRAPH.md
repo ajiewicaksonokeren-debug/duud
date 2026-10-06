@@ -11,6 +11,7 @@ server/  Node ESM · Express 4 · better-sqlite3 (WAL, FK on) · socket.io · JW
 client/  React + Vite + react-router · axios · socket.io-client · Capacitor 8 (@capacitor/browser)
          npm run dev · npm run build · npm run cap:sync · cap:open / cap:open:ios
 tests/lint: TIDAK ADA (no test/lint script di kedua package) → verifikasi = build client + boot server
+.claude/   skills: knowledge-graph · self-review   Stop hook: hooks/verify.sh (node --check, vite build, graph-stale)
 ```
 
 ## Env vars
