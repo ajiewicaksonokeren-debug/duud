@@ -46,26 +46,34 @@ Backend deploy: render.yaml (Docker, SQLite on disk)
 # CBN Check-in Service (checkin/) — standalone, NOT part of Tebak Gambar
 
 ```
-Design: Daily_Login_Gamification_System.zip (CBN Check-in Design System / CheckinPhone / Admin .dc.html)
-Stack: Express 4 + better-sqlite3 + jsonwebtoken, vanilla HTML/JS (no build) · port 4100 · npm test (node:test)
+Design: Daily_Login_Gamification_System_1.zip (v2: all-WebView, no native UI; design said microCMS → we use Strapi)
+Stack: Node 22 + Express 4 + better-sqlite3 + jsonwebtoken (session cookie), vanilla HTML/JS, no build · port 4100 · npm test
+Language choice: stay JS/Node = same runtime as Strapi, one language for the team
 ├─ public/points.js ── pure rules, shared by server + admin simulator (single source of truth)
 │     base 10 × streak mult (H1 ×1 · H7 ×1,2 · H14 ×1,5 · H30 ×2), Math.round
 │     + level bonus round(base × pct) · Basic 0/0% · Silver 1.000/5% · Gold 5.000/10% · Platinum 15.000/20% (lifetime pts)
 │     + 50 every streak%7==0 · milestones once per customer ever: 7:100 14:200 30:500 60:1.000 100:2.000
-│     events: multiplier ×(base+lb) only (max ×3) · time_window +N, end exclusive · challenge +N on Nth check-in in period
-│     max 1 non-draft event per type overlapping (409 on save)
+│     events: multiplier ×(base+lb) only (>1, ≤3) · time_window +N, end exclusive · challenge +N on Nth check-in in period
+├─ src/cms.js ── Strapi sync (start, every 5 min, POST /hooks/strapi) → settings.cms_config + events table mirror
+│     handles Strapi v4 (attributes) and v5 (flat) · relative media → STRAPI_URL prefix · failure keeps last mirror, retry 30 s
+│     invalid / same-type overlapping events skipped (earlier start wins) → warnings in admin
+│     config not published → enabled:false · segments = comma text, matched to exchange segments (empty = all)
 ├─ src/engine.js ── WIB = fixed UTC+7, day = WIB date, reset 00:00:00 WIB
-│     claim(): transaction + UNIQUE(customer_id, day) → idempotent (409)
+│     claim(): transaction + UNIQUE(customer_id, day) → idempotent (409) · 403 when Strapi enabled=false
 │     streak continues only if last_day == yesterday; broken → shows 0, next claim = 1; level never drops
 │     balance = sum of last expiryMonths (12) · lifetime = all · leaderboard ties → earlier MAX(claimed_at)
-│     names masked "Dian A." for others (maskName); full name only in admin
-├─ src/index.js ── auth: CBN JWT (CBN_JWT_PUBLIC_KEY | CBN_JWT_SECRET), customer_id from claim, never from body
-│     admin: Bearer ADMIN_TOKEN · /dev/token only when NODE_ENV≠production
-│     settings table key 'rules' (JSON) = rules + popup + board.size, editable at /admin
-├─ public/app.html ── webview ?view=sheet|card|poin|rank, token in #token=, bridge msgs close/navigate/claimed/resize/unauthorized
-├─ public/admin.html ── Dashboard · Aturan Poin (+30-day sim) · Event · Log + CSV (formula-injection safe)
-├─ public/demo.html ── fake CBN Beranda hosting the webviews (dev)
-└─ NOT built (needs CBN systems/business numbers): push notif, segment targeting, customer DB/API integration,
-      Streak Freeze / comeback bonus, admin roles, image upload (URLs only)
+│     showToast = enabled && popupEnabled && !claimed && not dismissed today
+├─ src/index.js ── POST /api/session {code} → CBN_EXCHANGE_URL → cookie cbn_checkin (HttpOnly, SameSite=Lax, Secure in prod, 12 h)
+│     customer_id only from exchange, never from browser · /dev/code (base64url JSON) only without CBN_EXCHANGE_URL and not prod
+│     admin: Bearer ADMIN_TOKEN · GET /api/internal/status/:id (INTERNAL_TOKEN) · CSP script-src 'self' (no inline JS)
+│     settings 'rules' = point rules + board.size (edited at /admin); content lives in Strapi
+├─ public/app.html+app.js ── ?mode=toast (pop-up card, resize/open_full/close) | ?mode=page (misi, saldo, event, rincian, #rank, riwayat)
+│     bridge: Android CBNBridge.postMessage(json) · iOS webkit.messageHandlers.cbn · demo iframe parent
+│     msgs: resize, open_full, close, checkin_success{points,claimed_at}, haptic, session_expired
+├─ public/admin.* ── Dashboard · Aturan Poin (+30-day sim) · Event & konten (read-only from Strapi, "Sinkron sekarang") · Log + CSV
+├─ public/demo.* ── plays the CBN app: toast container + full container with app header
+├─ strapi/src/api/{checkin-config,checkin-event} ── schema + core router/controller/service to copy into the Strapi project
+└─ NOT built (needs CBN systems/business numbers): push notif, open_deeplink use, Streak Freeze / comeback bonus,
+      admin roles · not tested against a real Strapi instance (mocked v4/v5 responses only)
       ⚠ SQLite = single instance only; multi-instance prod → Postgres
 ```

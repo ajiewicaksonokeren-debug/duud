@@ -6,10 +6,10 @@
 <title>Demo Check-in CBN</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+#full:not([hidden]){display:flex}
 body{margin:0;background:#E9EDF2;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#12263A;display:flex;flex-wrap:wrap;gap:32px;justify-content:center;padding:32px 16px}
 .phone{width:390px;max-width:100%;height:844px;border-radius:36px;background:#F1F3F6;overflow:hidden;box-shadow:0 24px 60px rgba(14,34,51,.18);position:relative;display:flex;flex-direction:column}
 iframe{border:0;display:block;width:100%;background:transparent}
-.layer{position:absolute;inset:0;height:100%}
 aside{max-width:340px;display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.5;color:#3C4A57}
 aside input,aside button{font:inherit;padding:10px 12px;border-radius:12px;border:1px solid #E2E9F0}
 aside button{background:#0B72C4;color:#fff;border:0;font-weight:700;cursor:pointer}
@@ -19,55 +19,28 @@ code{background:#fff;padding:1px 5px;border-radius:6px;font-size:12.5px}
 <body>
 <div class="phone" id="phone">
   <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 18px 14px;background:#fff"><div style="font-size:22px;font-weight:800"><span style="color:#0B72C4">CBN</span><span style="color:#5BB4E8;font-weight:600">fiber</span></div><span style="background:#0F2E4A;color:#fff;font-size:13px;font-weight:600;padding:8px 16px;border-radius:20px">● Online</span></div>
-  <div style="background:linear-gradient(160deg,#1183CE,#0A5FA5);padding:16px 20px;color:#fff"><div style="font-size:19px;font-weight:700" id="uname">Dian Anggraeni ⌄</div><div style="font-size:14px;opacity:.95" id="uid">30110910 | CBN Fiber 100 New</div></div>
+  <div style="background:linear-gradient(160deg,#1183CE,#0A5FA5);padding:16px 20px;color:#fff"><div style="font-size:19px;font-weight:700" id="uname">Dian Anggraeni ⌄</div><div style="font-size:14px;opacity:.95">30110910 | CBN Fiber 100 New</div></div>
   <div style="background:#0E4C86;color:#fff;padding:13px 20px;font-weight:600">Tagihan Anda ›</div>
   <div style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:14px;padding:14px 0 24px">
-    <div style="margin:0 16px;background:linear-gradient(90deg,#3FA0E0,#8FD0F5);border-radius:12px;padding:12px 14px;font-weight:800;color:#0C3E68">Cybro Loyalty ›</div>
-    <iframe id="card" title="Check-in Harian" style="height:76px"></iframe>
+    <button id="menu" style="margin:0 16px;border:0;text-align:left;background:linear-gradient(90deg,#3FA0E0,#8FD0F5);border-radius:12px;padding:12px 14px;font:800 15px 'Plus Jakarta Sans';color:#0C3E68;cursor:pointer">Cybro Loyalty · Poin ›</button>
     <div style="margin:0 16px;background:#fff;border:1px solid #E2E9F0;border-radius:16px;padding:16px 18px;font-weight:800">Layanan Saya</div>
     <div style="margin:0 16px;height:96px;border-radius:12px;background:linear-gradient(135deg,#0E86CF,#0A5A93)"></div>
   </div>
+  <!-- container 1: transparent WebView pinned under the status bar, full width - 24 -->
+  <iframe id="toast" title="Check-in" hidden style="position:absolute;top:52px;left:12px;width:calc(100% - 24px);height:64px;z-index:5"></iframe>
+  <!-- container 2: full WebView under the app header -->
+  <div id="full" hidden style="position:absolute;inset:0;z-index:6;background:#F1F3F6;flex-direction:column">
+    <div style="display:flex;align-items:center;gap:10px;padding:20px 14px 12px;background:#fff;border-bottom:1px solid #E7EBF0"><button id="x" aria-label="Tutup" style="width:34px;height:34px;border:0;background:none;font-size:22px;cursor:pointer">×</button><b style="font-size:16.5px">Check-in Harian</b></div>
+    <iframe id="fullweb" title="Check-in Harian" style="flex:1;height:auto"></iframe>
+  </div>
 </div>
 <aside>
-  <b style="font-size:18px;color:#12263A">Demo integrasi</b>
-  <span>Ini simulasi app CBN (native). Kartu dan pop-up adalah webview <code>/app?view=…</code>; pesan bridge muncul di log bawah.</span>
-  <input id="cid" value="30110910" aria-label="Customer ID"><input id="nm" value="Dian Anggraeni" aria-label="Nama">
-  <button id="login">Login sebagai pelanggan ini</button>
+  <b style="font-size:18px;color:#12263A">Demo wadah app</b>
+  <span>Halaman ini berperan sebagai app CBN: dua wadah WebView (pop-up kecil <code>mode=toast</code> dan halaman penuh <code>mode=page</code>) + bridge. Tidak ada UI check-in native. Pesan bridge muncul di log.</span>
+  <input id="cid" value="30110910" aria-label="Customer ID"><input id="nm" value="Dian Anggraeni" aria-label="Nama"><input id="seg" value="jakarta" aria-label="Segmen (pisah koma)">
+  <button id="login">Buka Beranda sebagai pelanggan ini</button>
   <pre id="log" style="background:#fff;border-radius:12px;padding:10px;font-size:12px;white-space:pre-wrap;max-height:260px;overflow:auto;margin:0"></pre>
 </aside>
-<script>
-let token = '';
-const $ = (id) => document.getElementById(id);
-const src = (view) => `/app?view=${view}&device=web#token=${encodeURIComponent(token)}`;
-let layer = null;
-function open(view) {
-  layer?.remove();
-  layer = Object.assign(document.createElement('iframe'), { className: 'layer', title: 'Check-in', src: src(view) });
-  $('phone').appendChild(layer);
-}
-function closeLayer() { layer?.remove(); layer = null; $('card').contentWindow?.postMessage({ cbnCheckin: 'reload' }, '*'); }
-window.addEventListener('message', (e) => {
-  const m = e.data?.cbnCheckin;
-  if (!m || typeof m !== 'object') return;
-  $('log').textContent = JSON.stringify(m) + '\n' + $('log').textContent;
-  if (m.type === 'navigate') open(m.view);
-  if (m.type === 'close') closeLayer();
-  if (m.type === 'claimed') $('card').contentWindow?.postMessage({ cbnCheckin: 'reload' }, '*');
-  if (m.type === 'resize' && e.source === $('card').contentWindow) $('card').style.height = m.height + 'px';
-});
-async function login() {
-  const r = await fetch('/dev/token', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ customer_id: $('cid').value, name: $('nm').value }) });
-  token = (await r.json()).token;
-  $('uname').textContent = $('nm').value + ' ⌄';
-  $('uid').textContent = $('cid').value + ' | CBN Fiber 100 New';
-  closeLayer();
-  $('card').src = src('card');
-  // Native app does this after Beranda loads: show the pop-up only when the server says so.
-  const s = await (await fetch('/api/checkin/state', { headers: { authorization: 'Bearer ' + token } })).json();
-  if (s.showPopup) open('sheet');
-}
-$('login').onclick = login;
-login();
-</script>
+<script src="/demo.js"></script>
 </body>
 </html>

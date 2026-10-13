@@ -11,7 +11,6 @@ export const DEFAULT_RULES = {
     { name: 'Gold', min: 5000, pct: 10 },
     { name: 'Platinum', min: 15000, pct: 20 },
   ],
-  popup: { enabled: true, title: 'Check-in Harian', button: 'Klaim Poin', heroUrl: '', successUrl: '' },
   board: { size: 10 },
 };
 

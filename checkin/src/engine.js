@@ -1,4 +1,5 @@
 import { db } from './db.js';
+import { getConfig } from './cms.js';
 import { DEFAULT_RULES, dayPoints, eventBonus, eventTag, levelAt, nextLevel, multiplier } from '../public/points.js';
 
 // Indonesia has no DST, so WIB is a fixed UTC+7 offset.
@@ -22,17 +23,24 @@ export const maskName = (name) => {
   return w.length ? (w.length > 1 ? `${w[0]} ${w[w.length - 1][0]}.` : w[0]) : 'Pelanggan';
 };
 
-export function touchCustomer(id, name, now) {
+// Called on session exchange: name + segments come from the CBN backend, never from the browser.
+export function touchCustomer(id, name, segments, now) {
   db.prepare(
-    `INSERT INTO customers (customer_id, name, created_at) VALUES (?, ?, ?)
-     ON CONFLICT(customer_id) DO UPDATE SET name = excluded.name WHERE excluded.name <> '' AND excluded.name <> name`
-  ).run(id, name || '', now);
+    `INSERT INTO customers (customer_id, name, segments, created_at) VALUES (?, ?, ?, ?)
+     ON CONFLICT(customer_id) DO UPDATE SET name = CASE WHEN excluded.name <> '' THEN excluded.name ELSE name END, segments = excluded.segments`
+  ).run(id, name || '', JSON.stringify(segments), now);
 }
 
 const getCustomer = (id) => db.prepare('SELECT * FROM customers WHERE customer_id = ?').get(id);
 
-const activeEvents = (from, to = from + 1) =>
-  db.prepare('SELECT * FROM events WHERE draft = 0 AND start_at < ? AND end_at > ? ORDER BY id').all(to, from);
+// Events overlapping [from, to) that target this customer (no segments = everyone).
+function activeEvents(c, from, to = from + 1) {
+  const mine = JSON.parse(c.segments);
+  return db
+    .prepare('SELECT * FROM events WHERE start_at < ? AND end_at > ? ORDER BY id')
+    .all(to, from)
+    .filter((ev) => { const s = JSON.parse(ev.segments); return !s.length || s.some((x) => mine.includes(x)); });
+}
 
 const countInEvent = (id, ev) =>
   db.prepare('SELECT COUNT(*) n FROM checkins WHERE customer_id = ? AND claimed_at >= ? AND claimed_at < ?').get(id, ev.start_at, ev.end_at).n;
@@ -45,11 +53,11 @@ function totals(id, now, r) {
     .get(since.getTime(), id);
 }
 
-// Points for a claim made at `now` on streak day `s`. `extra` = check-ins already counted for challenges.
-function quote(r, id, s, levelPct, paid, now) {
+// Points for a claim made at `now` on streak day `s`.
+function quote(r, c, s, levelPct, paid, now) {
   const p = dayPoints(r, s, levelPct, paid);
   const hms = wibHms(now);
-  const events = activeEvents(now).map((ev) => ({ id: ev.id, name: ev.name, bonus: eventBonus(ev, p, hms, countInEvent(id, ev) + 1) }));
+  const events = activeEvents(c, now).map((ev) => ({ id: ev.id, name: ev.name, bonus: eventBonus(ev, p, hms, countInEvent(c.customer_id, ev) + 1) }));
   const eventTotal = events.reduce((a, e) => a + e.bonus, 0);
   return { ...p, events, eventBonus: eventTotal, total: p.total + eventTotal };
 }
@@ -62,7 +70,7 @@ export function claim(id, device, now) {
     if (c.last_day === today) return { already: true };
     const s = c.last_day === addDays(today, -1) ? c.streak + 1 : 1;
     const paid = JSON.parse(c.milestones);
-    const q = quote(r, id, s, levelAt(r, totals(id, now, r).lifetime).pct, paid, now);
+    const q = quote(r, c, s, levelAt(r, totals(id, now, r).lifetime).pct, paid, now);
     db.prepare(
       `INSERT INTO checkins (customer_id, day, claimed_at, streak, multiplier, base, level_bonus, cycle_bonus, milestone_bonus, event_bonus, total, events, device)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
@@ -89,6 +97,7 @@ function eventView(ev, id, claimedToday) {
 
 export function state(id, now) {
   const r = getRules();
+  const cfg = getConfig();
   const c = getCustomer(id);
   const today = wibDay(now);
   const claimed = c.last_day === today;
@@ -99,7 +108,7 @@ export function state(id, now) {
   const { lifetime, balance } = totals(id, now, r);
   const todayRow = claimed ? db.prepare('SELECT * FROM checkins WHERE customer_id = ? AND day = ?').get(id, today) : null;
   const lv = levelAt(r, lifetime - (todayRow?.total || 0));
-  const q = claimed ? rowQuote(todayRow) : quote(r, id, todayS, lv.pct, paid, now);
+  const q = claimed ? rowQuote(todayRow) : quote(r, c, todayS, lv.pct, paid, now);
 
   // 7-day cycle: H(todayS - cycleDay + 1) .. +6. Past days are done; future days show projected points.
   const cycleDay = ((todayS - 1) % 7) + 1;
@@ -108,7 +117,7 @@ export function state(id, now) {
     const day = addDays(today, s - todayS);
     const status = s < todayS || (s === todayS && claimed) ? 'done' : s === todayS ? 'today' : 'locked';
     const p = s === todayS ? q : dayPoints(r, s, lv.pct, paid);
-    const evs = s === todayS ? activeEvents(now) : activeEvents(dayStartMs(day), dayStartMs(addDays(day, 1)));
+    const evs = s === todayS ? activeEvents(c, now) : activeEvents(c, dayStartMs(day), dayStartMs(addDays(day, 1)));
     const ev = evs.find((e) => e.type !== 'challenge');
     const extra = s === todayS ? 0 : ev?.type === 'multiplier' ? Math.round((p.base + p.lb) * (ev.value - 1)) : 0;
     return { day: s, status, points: p.total + extra, bonus: p.cycle + p.milestone > 0, eventTag: ev ? eventTag(ev) : null };
@@ -144,15 +153,15 @@ export function state(id, now) {
     streak: claimed ? c.streak : streak,
     basePoints: r.base,
     multiplier: multiplier(r, claimed ? todayS : Math.max(1, streak)),
-    showPopup: r.popup.enabled && !claimed && c.popup_dismissed_day !== today,
-    popup: r.popup,
+    showToast: cfg.enabled && cfg.popupEnabled && !claimed && c.popup_dismissed_day !== today,
+    config: cfg,
     todayPoints: q,
     week,
     nextBonus: { day: nb, inDays: nb - todayS, points: week.find((w) => w.day === nb)?.points ?? dayPoints(r, nb, lv.pct, paid).total },
     balance,
     lifetime,
     level: { name: levelAt(r, lifetime).name, pct: levelAt(r, lifetime).pct, min: levelAt(r, lifetime).min, next: nx && { name: nx.name, min: nx.min } },
-    events: activeEvents(now).map((ev) => eventView(ev, id, claimed)),
+    events: activeEvents(c, now).map((ev) => eventView(ev, id, claimed)),
     rank: rank ? { position: rank.r, points: rank.pts } : null,
     boardSize: r.board.size,
     boardCutoff: cutoff?.pts ?? null,

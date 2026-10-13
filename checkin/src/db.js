@@ -9,7 +9,7 @@ fs.mkdirSync(path.dirname(dbPath), { recursive: true });
 export const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
 
-// Only customer_id (+ display name from the CBN token) is stored; all times are epoch ms (UTC).
+// Only customer_id (+ display name and segments from the CBN session exchange) is stored; all times are epoch ms (UTC).
 db.exec(`
 CREATE TABLE IF NOT EXISTS customers (
   customer_id TEXT PRIMARY KEY,
@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS customers (
   last_claimed_at INTEGER,
   milestones TEXT NOT NULL DEFAULT '[]',
   popup_dismissed_day TEXT,
+  segments TEXT NOT NULL DEFAULT '[]',
   created_at INTEGER NOT NULL
 );
 CREATE TABLE IF NOT EXISTS checkins (
@@ -40,8 +41,9 @@ CREATE TABLE IF NOT EXISTS checkins (
 );
 CREATE INDEX IF NOT EXISTS checkins_day ON checkins(day);
 CREATE INDEX IF NOT EXISTS checkins_customer_time ON checkins(customer_id, claimed_at);
+-- Mirror of published Strapi events (src/cms.js replaces it on every sync); id = Strapi id.
 CREATE TABLE IF NOT EXISTS events (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id INTEGER PRIMARY KEY,
   name TEXT NOT NULL,
   type TEXT NOT NULL CHECK (type IN ('multiplier','time_window','challenge')),
   value REAL NOT NULL,
@@ -50,9 +52,8 @@ CREATE TABLE IF NOT EXISTS events (
   window_start TEXT,
   window_end TEXT,
   target_days INTEGER,
-  banner_url TEXT NOT NULL DEFAULT '',
-  draft INTEGER NOT NULL DEFAULT 0,
-  created_at INTEGER NOT NULL
+  segments TEXT NOT NULL DEFAULT '[]',
+  banner_url TEXT NOT NULL DEFAULT ''
 );
 CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 `);
