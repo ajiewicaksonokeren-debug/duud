@@ -42,3 +42,30 @@ Mobile deploy
 Backend deploy: render.yaml (Docker, SQLite on disk)
       ⚠ plan: free + disk — Render free instances don't support persistent disks
 ```
+
+# CBN Check-in Service (checkin/) — standalone, NOT part of Tebak Gambar
+
+```
+Design: Daily_Login_Gamification_System.zip (CBN Check-in Design System / CheckinPhone / Admin .dc.html)
+Stack: Express 4 + better-sqlite3 + jsonwebtoken, vanilla HTML/JS (no build) · port 4100 · npm test (node:test)
+├─ public/points.js ── pure rules, shared by server + admin simulator (single source of truth)
+│     base 10 × streak mult (H1 ×1 · H7 ×1,2 · H14 ×1,5 · H30 ×2), Math.round
+│     + level bonus round(base × pct) · Basic 0/0% · Silver 1.000/5% · Gold 5.000/10% · Platinum 15.000/20% (lifetime pts)
+│     + 50 every streak%7==0 · milestones once per customer ever: 7:100 14:200 30:500 60:1.000 100:2.000
+│     events: multiplier ×(base+lb) only (max ×3) · time_window +N, end exclusive · challenge +N on Nth check-in in period
+│     max 1 non-draft event per type overlapping (409 on save)
+├─ src/engine.js ── WIB = fixed UTC+7, day = WIB date, reset 00:00:00 WIB
+│     claim(): transaction + UNIQUE(customer_id, day) → idempotent (409)
+│     streak continues only if last_day == yesterday; broken → shows 0, next claim = 1; level never drops
+│     balance = sum of last expiryMonths (12) · lifetime = all · leaderboard ties → earlier MAX(claimed_at)
+│     names masked "Dian A." for others (maskName); full name only in admin
+├─ src/index.js ── auth: CBN JWT (CBN_JWT_PUBLIC_KEY | CBN_JWT_SECRET), customer_id from claim, never from body
+│     admin: Bearer ADMIN_TOKEN · /dev/token only when NODE_ENV≠production
+│     settings table key 'rules' (JSON) = rules + popup + board.size, editable at /admin
+├─ public/app.html ── webview ?view=sheet|card|poin|rank, token in #token=, bridge msgs close/navigate/claimed/resize/unauthorized
+├─ public/admin.html ── Dashboard · Aturan Poin (+30-day sim) · Event · Log + CSV (formula-injection safe)
+├─ public/demo.html ── fake CBN Beranda hosting the webviews (dev)
+└─ NOT built (needs CBN systems/business numbers): push notif, segment targeting, customer DB/API integration,
+      Streak Freeze / comeback bonus, admin roles, image upload (URLs only)
+      ⚠ SQLite = single instance only; multi-instance prod → Postgres
+```
