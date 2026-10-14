@@ -70,10 +70,12 @@ Language choice: stay JS/Node = same runtime as Strapi, one language for the tea
 ├─ public/app.html+app.js ── ?mode=toast (pop-up card, resize/open_full/close) | ?mode=page (misi, saldo, event, rincian, #rank, riwayat)
 │     bridge: Android CBNBridge.postMessage(json) · iOS webkit.messageHandlers.cbn · demo iframe parent
 │     msgs: resize, open_full, close, checkin_success{points,claimed_at}, haptic, session_expired
+│     open_deeplink{url}: buttons from Strapi config.loyalty_link (saldo card) + event.link (event card)
+│     links allowlisted server-side by cms.safeLink: cbn://… or https://(*.)cbn.id; bad link → dropped + warning, event kept
 ├─ public/admin.* ── Dashboard · Aturan Poin (+30-day sim) · Event & konten (read-only from Strapi, "Sinkron sekarang") · Log + CSV
 ├─ public/demo.* ── plays the CBN app: toast container + full container with app header
 ├─ strapi/src/api/{checkin-config,checkin-event} ── schema + core router/controller/service to copy into the Strapi project
-└─ NOT built (needs CBN systems/business numbers): push notif, open_deeplink use, Streak Freeze / comeback bonus,
+└─ NOT built (needs CBN systems/business numbers): push notif, Streak Freeze / comeback bonus,
       admin roles · not tested against a real Strapi instance (mocked v4/v5 responses only)
       ⚠ SQLite = single instance only; multi-instance prod → Postgres
 ```

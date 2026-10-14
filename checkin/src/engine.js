@@ -89,7 +89,7 @@ const rowQuote = (row) => ({
 });
 
 function eventView(ev, id, claimedToday) {
-  const v = { id: ev.id, name: ev.name, type: ev.type, value: ev.value, tag: eventTag(ev), endAt: ev.end_at, bannerUrl: ev.banner_url };
+  const v = { id: ev.id, name: ev.name, type: ev.type, value: ev.value, tag: eventTag(ev), endAt: ev.end_at, bannerUrl: ev.banner_url, link: ev.link };
   if (ev.type === 'time_window') Object.assign(v, { windowStart: ev.window_start, windowEnd: ev.window_end });
   if (ev.type === 'challenge') Object.assign(v, { targetDays: ev.target_days, progress: Math.min(ev.target_days, countInEvent(id, ev)), claimedToday });
   return v;

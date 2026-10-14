@@ -5,7 +5,13 @@ import { db } from './db.js';
 const STRAPI_URL = (process.env.STRAPI_URL || '').replace(/\/$/, '');
 const TTL = 5 * 60e3;
 
-export const DEFAULT_CONFIG = { enabled: true, popupEnabled: true, title: 'Check-in Harian', popupImage: '', successImage: '' };
+export const DEFAULT_CONFIG = { enabled: true, popupEnabled: true, title: 'Check-in Harian', popupImage: '', successImage: '', loyaltyLink: '' };
+
+// Only app deeplinks (cbn://…) and pages on *.cbn.id may be opened from the WebView; anything else is dropped. -aj
+export const safeLink = (u) => {
+  const s = String(u || '').trim();
+  return /^cbn:\/\/[\w\-./?=&%]+$/.test(s) || /^https:\/\/([\w-]+\.)*cbn\.id(\/[^\s"'<>]*)?$/.test(s) ? s : '';
+};
 
 let syncedAt = 0;
 let nextSync = 0;
@@ -51,6 +57,7 @@ function toEvent(e) {
     target_days: type === 'challenge' ? Math.trunc(Number(e.target_days)) : null,
     segments: JSON.stringify((Array.isArray(e.segments) ? e.segments : String(e.segments || '').split(',')).map((s) => String(s).trim().toLowerCase()).filter(Boolean)),
     banner_url: media(e.banner),
+    link: safeLink(e.link),
   };
   const bad =
     !ev.name ? 'nama kosong'
@@ -61,7 +68,8 @@ function toEvent(e) {
     : type === 'time_window' && !(ev.window_start && ev.window_end && ev.window_start < ev.window_end) ? 'jam berlaku tidak valid'
     : type === 'challenge' && !(ev.target_days >= 1) ? 'target hari tidak valid'
     : null;
-  return { ev, bad };
+  const warn = e.link && !ev.link ? `Link event "${ev.name}" dihapus: "${e.link}" bukan cbn:// atau https://*.cbn.id` : null;
+  return { ev, bad, warn };
 }
 
 export async function sync() {
@@ -77,19 +85,22 @@ export async function sync() {
     // Max 1 event per type at a time: the earlier start wins, the clash is reported in the admin. -aj
     const w = [];
     const kept = [];
-    for (const { ev, bad } of items.map(toEvent).sort((a, b) => a.ev.start_at - b.ev.start_at)) {
+    for (const { ev, bad, warn } of items.map(toEvent).sort((a, b) => a.ev.start_at - b.ev.start_at)) {
       const clash = kept.find((k) => k.type === ev.type && k.start_at < ev.end_at && k.end_at > ev.start_at);
       if (bad || clash) w.push(`Event "${ev.name || ev.id}" diabaikan: ${bad || `bentrok dengan "${clash.name}"`}`);
-      else kept.push(ev);
+      else {
+        kept.push(ev);
+        if (warn) w.push(warn);
+      }
     }
     db.transaction(() => {
       saveSetting('cms_config', cfg
-        ? { enabled: cfg.enabled !== false, popupEnabled: cfg.popup_enabled !== false, title: cfg.entry_title || DEFAULT_CONFIG.title, popupImage: media(cfg.popup_image), successImage: media(cfg.success_image) }
+        ? { enabled: cfg.enabled !== false, popupEnabled: cfg.popup_enabled !== false, title: cfg.entry_title || DEFAULT_CONFIG.title, popupImage: media(cfg.popup_image), successImage: media(cfg.success_image), loyaltyLink: safeLink(cfg.loyalty_link) }
         : { enabled: false });
       db.prepare('DELETE FROM events').run();
       const ins = db.prepare(
-        `INSERT INTO events (id, name, type, value, start_at, end_at, window_start, window_end, target_days, segments, banner_url)
-         VALUES (@id, @name, @type, @value, @start_at, @end_at, @window_start, @window_end, @target_days, @segments, @banner_url)`
+        `INSERT INTO events (id, name, type, value, start_at, end_at, window_start, window_end, target_days, segments, banner_url, link)
+         VALUES (@id, @name, @type, @value, @start_at, @end_at, @window_start, @window_end, @target_days, @segments, @banner_url, @link)`
       );
       kept.forEach((e) => ins.run(e));
     })();

@@ -49,25 +49,26 @@ test('events: multiplier, time window end exclusive, challenge on Nth day', () =
   assert.deepEqual(rows.map((r) => r.total), [40, 20, 530]);
 });
 
-test('Strapi sync: v5 + v4 shapes, invalid and clashing events skipped, outage keeps last mirror', async () => {
+test('Strapi sync: v5 + v4 shapes, invalid and clashing events skipped, links allowlisted, outage keeps last mirror', async () => {
   const iso = (d, t) => new Date(at(d, t)).toISOString();
-  const v5 = { id: 1, name: 'Double', type: 'multiplier', value: '2', start_at: iso('2026-12-01', '00:00:00'), end_at: iso('2026-12-03', '00:00:00'), banner: { url: '/uploads/b.png' } };
-  const v4 = { id: 2, attributes: { name: 'Early', type: 'time_window', value: 20, start_at: iso('2026-12-01', '00:00:00'), end_at: iso('2026-12-31', '00:00:00'), window_start: '05:00:00.000', window_end: '09:00:00.000', segments: 'Jakarta, Surabaya' } };
+  const v5 = { id: 1, name: 'Double', type: 'multiplier', value: '2', start_at: iso('2026-12-01', '00:00:00'), end_at: iso('2026-12-03', '00:00:00'), banner: { url: '/uploads/b.png' }, link: 'cbn://promo/double' };
+  const v4 = { id: 2, attributes: { name: 'Early', type: 'time_window', value: 20, start_at: iso('2026-12-01', '00:00:00'), end_at: iso('2026-12-31', '00:00:00'), window_start: '05:00:00.000', window_end: '09:00:00.000', segments: 'Jakarta, Surabaya', link: 'https://cbn.id.evil.com/x' } };
   const clash = { id: 3, name: 'Triple', type: 'multiplier', value: 3, start_at: iso('2026-12-02', '00:00:00'), end_at: iso('2026-12-04', '00:00:00') };
   const bad = { id: 4, name: 'Too big', type: 'multiplier', value: 5, start_at: iso('2026-12-01', '00:00:00'), end_at: iso('2026-12-02', '00:00:00') };
   const responses = {
-    '/api/checkin-config': { data: { id: 1, enabled: true, popup_enabled: false, entry_title: 'Misi Harian', popup_image: { url: 'https://img.test/h.png' } } },
+    '/api/checkin-config': { data: { id: 1, enabled: true, popup_enabled: false, entry_title: 'Misi Harian', popup_image: { url: 'https://img.test/h.png' }, loyalty_link: 'cbn://cybro-loyalty' } },
     '/api/checkin-events': { data: [v5, v4, clash, bad], meta: { pagination: { pageCount: 1 } } },
   };
   globalThis.fetch = async (url) => ({ ok: true, status: 200, json: async () => responses[new URL(url).pathname] });
   await sync();
-  const events = db.prepare('SELECT id, name, segments, window_start, banner_url FROM events ORDER BY id').all();
+  const events = db.prepare('SELECT id, name, segments, window_start, banner_url, link FROM events ORDER BY id').all();
   assert.deepEqual(events.map((e) => e.name), ['Double', 'Early']);
   assert.equal(events[0].banner_url, 'https://cms.test/uploads/b.png');
   assert.equal(events[1].window_start, '05:00:00');
   assert.equal(events[1].segments, '["jakarta","surabaya"]');
-  assert.equal(cmsStatus().warnings.length, 2);
-  assert.deepEqual(getConfig(), { enabled: true, popupEnabled: false, title: 'Misi Harian', popupImage: 'https://img.test/h.png', successImage: '' });
+  assert.deepEqual(events.map((e) => e.link), ['cbn://promo/double', ''], 'non-allowlisted link dropped, event kept');
+  assert.equal(cmsStatus().warnings.length, 3);
+  assert.deepEqual(getConfig(), { enabled: true, popupEnabled: false, title: 'Misi Harian', popupImage: 'https://img.test/h.png', successImage: '', loyaltyLink: 'cbn://cybro-loyalty' });
 
   globalThis.fetch = async () => ({ ok: false, status: 503 });
   await sync();

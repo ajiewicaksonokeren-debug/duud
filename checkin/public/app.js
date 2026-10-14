@@ -90,6 +90,11 @@ async function doClaim() {
 function openFull() {
   if (!send({ type: 'open_full' })) location.href = '?mode=page';
 }
+// Links come from Strapi and are allowlisted by the server (cms.safeLink). The app routes cbn://… to its own screens. -aj
+function openLink(url) {
+  if (send({ type: 'open_deeplink', url })) return;
+  if (url.startsWith('https://')) location.href = url; // plain browser (no app): cbn:// cannot open, https can -aj
+}
 function dismiss() {
   api('/checkin/dismiss', { method: 'POST' }).catch(() => {});
   send({ type: 'close' });
@@ -176,6 +181,7 @@ function main() {
       <div style="display:flex;align-items:center;gap:10px">${coin(30)}<b class="num" style="font-size:32px;font-weight:800;letter-spacing:-.01em">${fmt(S.balance)}</b></div>
       <div class="prog" style="background:rgba(255,255,255,.25)" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><div style="width:${pct}%;background:#fff"></div></div>
       <span style="font-size:12px;opacity:.9">${fmt(S.lifetime)} poin seumur hidup · ${lv.next ? `${fmt(lv.next.min - S.lifetime)} lagi ke ${esc(lv.next.name)}` : 'level tertinggi'}</span>
+      ${S.config.loyaltyLink ? `<button data-link="${esc(S.config.loyaltyLink)}" style="height:44px;border-radius:12px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);color:#fff;font-weight:700;font-size:14px">Tukar poin di Cybro Loyalty ›</button>` : ''}
     </div>
     ${e ? `<div class="card" style="border-color:var(--pt-bd);overflow:hidden">
       <div style="position:relative;height:110px;background:linear-gradient(135deg,#FFB020,#F08A00) center/cover;${e.bannerUrl ? `background-image:url('${esc(e.bannerUrl)}')` : ''}"><span style="position:absolute;top:10px;left:10px;background:#fff;color:var(--pt-text);font-size:10.5px;font-weight:800;padding:4px 8px;border-radius:6px;letter-spacing:.04em">EVENT AKTIF</span></div>
@@ -184,6 +190,7 @@ function main() {
         <span style="font-size:13px;color:var(--text2);line-height:1.5">${evDesc(e)}</span>
         ${e.type === 'challenge' ? `<div class="prog" style="background:#FFE9BF"><div style="width:${(e.progress / e.targetDays) * 100}%;background:var(--pt)"></div></div>` : ''}
         <span class="muted num" style="font-size:12px">${evSub(e)}</span>
+        ${e.link ? `<button data-link="${esc(e.link)}" style="align-self:flex-start;min-height:44px;background:none;padding:0;color:var(--primary);font-weight:700;font-size:13.5px">Lihat detail event ›</button>` : ''}
       </div></div>` : ''}
     <div class="card" style="padding:14px 16px;display:flex;flex-direction:column;gap:9px">
       <b style="font-size:15px">Rincian poin hari ini${S.claimed ? '' : ' (kalau klaim sekarang)'}</b>
@@ -239,8 +246,9 @@ function render() {
 }
 
 document.addEventListener('click', (ev) => {
-  const t = ev.target.closest('[data-a],[data-mode]');
+  const t = ev.target.closest('[data-a],[data-mode],[data-link]');
   if (!t) return;
+  if (t.dataset.link) return openLink(t.dataset.link);
   if (t.dataset.mode) { boardMode = t.dataset.mode; board = null; render(); return loadBoard(); }
   ({
     claim: doClaim, dismiss, open: openFull, retry: start,

@@ -13,6 +13,7 @@
     "window_end": { "type": "time" },
     "target_days": { "type": "integer", "min": 1 },
     "segments": { "type": "string" },
+    "link": { "type": "string" },
     "banner": { "type": "media", "multiple": false, "allowedTypes": ["images"] }
   }
 }

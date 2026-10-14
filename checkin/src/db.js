@@ -53,7 +53,11 @@ CREATE TABLE IF NOT EXISTS events (
   window_end TEXT,
   target_days INTEGER,
   segments TEXT NOT NULL DEFAULT '[]',
-  banner_url TEXT NOT NULL DEFAULT ''
+  banner_url TEXT NOT NULL DEFAULT '',
+  link TEXT NOT NULL DEFAULT ''
 );
 CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 `);
+
+// v2 databases predate events.link; the table is only a Strapi mirror, so adding the column is safe. -aj
+if (!db.prepare('PRAGMA table_info(events)').all().some((c) => c.name === 'link')) db.exec("ALTER TABLE events ADD COLUMN link TEXT NOT NULL DEFAULT ''");

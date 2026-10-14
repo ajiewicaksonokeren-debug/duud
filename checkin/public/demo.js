@@ -30,6 +30,8 @@ window.addEventListener('message', (e) => {
   if (m.type === 'close') fromToast ? closeToast() : closeFull();
   if (m.type === 'checkin_success') closeToast();
   if (m.type === 'session_expired' && !fromToast) openFull();
+  // A real app maps cbn://… to a native screen (see README "Routing"); the demo only shows where it would go. -aj
+  if (m.type === 'open_deeplink') { closeFull(); $('route').textContent = `App membuka ${m.url}`; $('route').hidden = false; setTimeout(() => ($('route').hidden = true), 2500); }
 });
 $('x').onclick = closeFull;
 $('login').onclick = () => { $('uname').textContent = $('nm').value + ' ⌄'; closeFull(); openToast(); };

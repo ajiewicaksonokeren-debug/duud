@@ -58,3 +58,80 @@ Bridge: Android `addJavascriptInterface(…, "CBNBridge")` (`postMessage(json)`)
 | `session_expired` | Muat ulang WebView itu dengan kode baru |
 
 Web app yang memutuskan pop-up tampil (belum klaim, belum ditutup hari ini, fitur & pop-up aktif). Peringkat ada di dalam halaman penuh (`#rank`), tombol back Android kembali ke misi.
+
+## Peta route
+
+**Server (`src/index.js`)**
+
+| Method | Path | Auth | Fungsi |
+|---|---|---|---|
+| POST | `/api/session` `{code}` | – | Tukar kode sekali pakai → cookie `cbn_checkin` (12 jam) |
+| GET | `/api/checkin/state` | cookie | Semua data layar (poin hari ini, 7 hari, event, saldo, peringkat, riwayat) |
+| POST | `/api/checkin/claim` `{device}` | cookie | 200 sukses · 409 sudah klaim hari ini · 403 fitur mati |
+| POST | `/api/checkin/dismiss` | cookie | "×" di pop-up → tidak tampil lagi hari ini |
+| GET | `/api/checkin/leaderboard?mode=points\|streak` | cookie | Top N + posisi sendiri |
+| GET | `/api/internal/status/:customerId` | `INTERNAL_TOKEN` | Untuk `/home/checkin-card` backend CBN |
+| POST | `/hooks/strapi` | `STRAPI_WEBHOOK_TOKEN` | Sinkron ulang konten Strapi |
+| * | `/api/admin/*` | `ADMIN_TOKEN` | dashboard, rules, events (baca saja), cms/sync, logs, logs.csv |
+| POST | `/dev/code` | – | Hanya dev (tanpa `CBN_EXCHANGE_URL`, bukan production) |
+
+**Web app (`public/app.js`)**: `/app?mode=toast` · `/app?mode=page` · `/app?mode=page#rank` (peringkat; tombol back Android kembali ke misi) · `/admin` · `/demo`.
+
+## Routing ke halaman app (`open_deeplink`)
+
+Web app bisa mengarahkan user ke layar app CBN. Link diatur di Strapi:
+
+| Di Strapi | Tampil di halaman check-in |
+|---|---|
+| Check-in Config → `loyalty_link` (default `cbn://cybro-loyalty`) | Tombol "Tukar poin di Cybro Loyalty ›" di kartu saldo |
+| Check-in Event → `link` | Tombol "Lihat detail event ›" di kartu event |
+
+Aturan link (dicek server di `cms.safeLink` saat sinkron):
+- Boleh: `cbn://…` (deeplink app) dan `https://cbn.id/…` / `https://*.cbn.id/…`.
+- Selain itu dihapus, dan muncul peringatan di Admin → Event & konten. Event-nya tetap jalan.
+- Web mengirim `{ "type": "open_deeplink", "url": "cbn://tagihan" }`. Di browser biasa (tanpa app), link `https://` dibuka langsung, sedangkan `cbn://` diabaikan.
+
+App **tetap wajib** mengecek ulang di sisi native. Jangan percaya URL dari WebView begitu saja:
+
+```kotlin
+// Android — dipanggil dari CbnBridge saat type == "open_deeplink" -aj
+object Router {
+    private val screens = mapOf(
+        "tagihan" to TagihanActivity::class.java,
+        "cybro-loyalty" to CybroLoyaltyActivity::class.java,
+        "upgrade" to UpgradeActivity::class.java,
+    )
+    fun open(ctx: Context, url: String) {
+        val uri = Uri.parse(url)
+        when {
+            uri.scheme == "cbn" -> screens[uri.host]?.let { ctx.startActivity(Intent(ctx, it).setData(uri)) }
+            uri.scheme == "https" && (uri.host == "cbn.id" || uri.host?.endsWith(".cbn.id") == true) ->
+                ctx.startActivity(Intent(ctx, InAppBrowserActivity::class.java).setData(uri))
+            else -> Unit // tolak diam-diam -aj
+        }
+    }
+}
+```
+
+```swift
+// iOS — dipanggil dari userContentController saat type == "open_deeplink" -aj
+enum Router {
+    static func open(_ raw: String?, from nav: UINavigationController?) {
+        guard let raw, let url = URL(string: raw), let host = url.host else { return }
+        switch url.scheme {
+        case "cbn":
+            let screens: [String: () -> UIViewController] = [
+                "tagihan": { TagihanViewController() },
+                "cybro-loyalty": { CybroLoyaltyViewController() },
+                "upgrade": { UpgradeViewController() },
+            ]
+            if let make = screens[host] { nav?.pushViewController(make(), animated: true) }
+        case "https" where host == "cbn.id" || host.hasSuffix(".cbn.id"):
+            nav?.present(SFSafariViewController(url: url), animated: true)
+        default: break // tolak diam-diam -aj
+        }
+    }
+}
+```
+
+Nama layar (`TagihanActivity`, `cybro-loyalty`, dst.) cuma contoh. Ganti sesuai daftar deeplink yang sudah ada di app CBN. Halaman penuh check-in sebaiknya ditutup dulu sebelum pindah layar.
