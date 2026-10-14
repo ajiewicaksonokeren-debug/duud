@@ -1,5 +1,5 @@
 // mode=toast: small pop-up WebView over Beranda. mode=page: full WebView under the app's own header ("Check-in Harian" + ×).
-// The app passes ?code=<one-time code>; it is exchanged for an HttpOnly session cookie and removed from the URL.
+// The app passes ?code=<one-time code>; it is exchanged for an HttpOnly session cookie and removed from the URL. -aj
 const qs = new URLSearchParams(location.search);
 const mode = qs.get('mode') === 'toast' ? 'toast' : 'page';
 const code = qs.get('code');
@@ -7,7 +7,7 @@ if (code) history.replaceState(null, '', `${location.pathname}?mode=${mode}${loc
 const device = /Android/i.test(navigator.userAgent) ? 'android' : /iPhone|iPad/i.test(navigator.userAgent) ? 'ios' : 'web';
 document.body.classList.toggle('toast', mode === 'toast');
 
-// Bridge: Android addJavascriptInterface "CBNBridge", iOS WKScriptMessageHandler "cbn", or the demo page (iframe parent).
+// Bridge: Android addJavascriptInterface "CBNBridge", iOS WKScriptMessageHandler "cbn", or the demo page (iframe parent). -aj
 function send(msg) {
   if (window.CBNBridge) return CBNBridge.postMessage(JSON.stringify(msg)), true;
   if (window.webkit?.messageHandlers?.cbn) return webkit.messageHandlers.cbn.postMessage(msg), true;
@@ -16,7 +16,7 @@ function send(msg) {
 }
 
 let S = null, skew = 0, board = null, boardMode = 'points', busy = false, err = '', expired = false;
-const now = () => Date.now() + skew; // server clock; countdowns never trust the phone clock
+const now = () => Date.now() + skew; // server clock; countdowns never trust the phone clock -aj
 const view = () => (mode === 'page' && location.hash === '#rank' ? 'rank' : 'main');
 
 async function api(path, opts = {}) {
@@ -29,7 +29,7 @@ async function api(path, opts = {}) {
 function onExpired() {
   if (expired) return;
   expired = true;
-  send({ type: 'session_expired' }); // app reloads this WebView with a fresh code
+  send({ type: 'session_expired' }); // app reloads this WebView with a fresh code -aj
   if (mode === 'toast') send({ type: 'close' });
   render();
 }
@@ -68,7 +68,7 @@ async function load() {
   S = await api('/checkin/state');
   skew = S.now - Date.now();
   err = '';
-  // The web app decides whether the pop-up shows; the app just releases the WebView on "close".
+  // The web app decides whether the pop-up shows; the app just releases the WebView on "close". -aj
   if (mode === 'toast' && !S.showToast) return send({ type: 'close' });
   render();
   if (view() === 'rank') loadBoard();
@@ -249,10 +249,10 @@ document.addEventListener('click', (ev) => {
     back: () => history.back(),
   })[t.dataset.a]?.();
 });
-// #rank lives in history, so the Android back button returns to the mission page.
+// #rank lives in history, so the Android back button returns to the mission page. -aj
 window.addEventListener('hashchange', () => { render(); scrollTo(0, 0); if (view() === 'rank') loadBoard(); });
 
-// Countdowns tick locally; screen readers get one update per minute. Day rollover refetches state.
+// Countdowns tick locally; screen readers get one update per minute. Day rollover refetches state. -aj
 let lastMin = -1;
 setInterval(() => {
   document.querySelectorAll('.cd').forEach((el) => (el.textContent = until(+el.dataset.to)));

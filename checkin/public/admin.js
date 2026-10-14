@@ -65,7 +65,7 @@ function logTable(rows) {
 function rulesPage() {
   if (!rules) return '';
   const r = rules;
-  // 30-day simulation: Basic level, unbroken streak, no event — same function the server uses.
+  // 30-day simulation: Basic level, unbroken streak, no event — same function the server uses. -aj
   const paid = [];
   let life = 0;
   const sim = Array.from({ length: 30 }, (_, i) => { const p = dayPoints(r, i + 1, levelAt(r, life).pct, paid); if (p.milestone) paid.push(i + 1); life += p.total; return p.total; });

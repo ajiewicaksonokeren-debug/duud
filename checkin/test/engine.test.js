@@ -25,7 +25,7 @@ test('design numbers: day 7, 14, 30', () => {
 test('streak follows WIB days, breaks after a gap, claim is once per day', () => {
   touchCustomer('c1', 'Dian Anggraeni', [], 0);
   claim('c1', '', at('2026-10-10', '23:59:59'));
-  claim('c1', '', at('2026-10-11', '00:00:00')); // next WIB day, one second later
+  claim('c1', '', at('2026-10-11', '00:00:00')); // next WIB day, one second later -aj
   assert.equal(claim('c1', '', at('2026-10-11', '12:00:00')).already, true);
   assert.equal(state('c1', at('2026-10-11')).streak, 2);
   assert.equal(state('c1', at('2026-10-12')).streak, 2, 'yesterday claimed: still alive');

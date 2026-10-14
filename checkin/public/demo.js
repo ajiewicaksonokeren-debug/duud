@@ -1,8 +1,8 @@
-// Plays the CBN app's part: two WebView containers (toast over Beranda, full page with the app header) + the bridge.
+// Plays the CBN app's part: two WebView containers (toast over Beranda, full page with the app header) + the bridge. -aj
 const $ = (id) => document.getElementById(id);
 const log = (m) => ($('log').textContent = JSON.stringify(m) + '\n' + $('log').textContent);
 
-// Stands in for the CBN backend's POST /checkin/session (one-time code, 60 s).
+// Stands in for the CBN backend's POST /checkin/session (one-time code, 60 s). -aj
 async function newCode() {
   const r = await fetch('/dev/code', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ customer_id: $('cid').value, name: $('nm').value, segments: $('seg').value.split(',') }) });
   return (await r.json()).code;

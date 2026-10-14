@@ -18,13 +18,13 @@ const SESSION_HOURS = 12;
 const app = express();
 app.disable('x-powered-by');
 app.use(express.json({ limit: '32kb' }));
-// WebView only ever loads our own pages; images may come from the Strapi media host.
+// WebView only ever loads our own pages; images may come from the Strapi media host. -aj
 app.use((req, res, next) => {
   res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https: data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'none'; form-action 'self'");
   res.setHeader('X-Content-Type-Options', 'nosniff');
   next();
 });
-// Refresh Strapi content in the background; requests never wait on Strapi.
+// Refresh Strapi content in the background; requests never wait on Strapi. -aj
 app.use((req, res, next) => { syncIfStale(); next(); });
 
 class HttpError extends Error {
@@ -38,10 +38,10 @@ const sha = (s) => crypto.createHash('sha256').update(String(s)).digest();
 const same = (a, b) => !!b && crypto.timingSafeEqual(sha(a), sha(b));
 const cookie = (req, name) => (req.headers.cookie || '').split(/;\s*/).find((c) => c.startsWith(name + '='))?.slice(name.length + 1);
 
-// One-time code from the CBN backend → customer. The user's real CBN login token never reaches the WebView.
+// One-time code from the CBN backend → customer. The user's real CBN login token never reaches the WebView. -aj
 async function exchange(code) {
   if (!exchangeUrl) {
-    // Dev only: the code is base64url JSON minted by /dev/code.
+    // Dev only: the code is base64url JSON minted by /dev/code. -aj
     return JSON.parse(Buffer.from(code, 'base64url').toString());
   }
   const res = await fetch(exchangeUrl, {
@@ -199,7 +199,7 @@ const range = (req) => {
 adm.get('/logs', (req, res) => res.json(logQuery(...range(req), 500)));
 adm.get('/logs.csv', (req, res) => {
   const [from, to, q] = range(req);
-  // Prefix formula-like cells so Excel doesn't execute them (CSV injection).
+  // Prefix formula-like cells so Excel doesn't execute them (CSV injection). -aj
   const cell = (v) => `"${String(v ?? '').replace(/^[=+\-@\t\r]/, "'$&").replace(/"/g, '""')}"`;
   const head = ['waktu_wib', 'customer_id', 'nama', 'streak', 'multiplier', 'base', 'bonus_level', 'bonus_hari7', 'milestone', 'bonus_event', 'total', 'event', 'perangkat'];
   const lines = logQuery(from, to, q, 1e6).map((l) =>
@@ -214,14 +214,14 @@ adm.get('/logs.csv', (req, res) => {
 app.use('/api/admin', adm);
 
 // Strapi → Settings → Webhooks: URL /hooks/strapi, header Authorization: Bearer <STRAPI_WEBHOOK_TOKEN>,
-// events entry.publish / entry.unpublish / entry.update / entry.delete.
+// events entry.publish / entry.unpublish / entry.update / entry.delete. -aj
 app.post('/hooks/strapi', async (req, res) => {
   if (!same(bearer(req), process.env.STRAPI_WEBHOOK_TOKEN)) return res.status(401).end();
   await sync();
   res.json({ ok: true });
 });
 
-// For the CBN backend's GET /home/checkin-card (server to server).
+// For the CBN backend's GET /home/checkin-card (server to server). -aj
 app.get('/api/internal/status/:customerId', (req, res) => {
   if (!same(bearer(req), process.env.INTERNAL_TOKEN)) return res.status(401).end();
   if (!db.prepare('SELECT 1 FROM customers WHERE customer_id = ?').get(req.params.customerId))
@@ -230,7 +230,7 @@ app.get('/api/internal/status/:customerId', (req, res) => {
   res.json({ enabled: s.config.enabled, showToast: s.showToast, claimed: s.claimed, claimedAt: s.claimedAt, streak: s.streak, todayPoints: s.todayPoints.total, events: s.events.map((e) => ({ name: e.name, tag: e.tag, endAt: e.endAt })) });
 });
 
-// Dev only: mint a one-time code like the CBN backend's POST /checkin/session would.
+// Dev only: mint a one-time code like the CBN backend's POST /checkin/session would. -aj
 if (!exchangeUrl && !PROD) {
   app.post('/dev/code', (req, res) => {
     const who = { customer_id: str(req.body?.customer_id, 40, 'customer_id') || '30110910', name: str(req.body?.name, 80, 'name') || 'Dian Anggraeni', segments: req.body?.segments || [] };

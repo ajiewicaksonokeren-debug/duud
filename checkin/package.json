@@ -1,6 +1,7 @@
 {
   "name": "cbn-checkin",
   "version": "1.0.0",
+  "author": "Ajie Wicaksono <ajiewicaksonokeren@gmail.com>",
   "private": true,
   "type": "module",
   "main": "src/index.js",

@@ -9,7 +9,7 @@ fs.mkdirSync(path.dirname(dbPath), { recursive: true });
 export const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
 
-// Only customer_id (+ display name and segments from the CBN session exchange) is stored; all times are epoch ms (UTC).
+// Only customer_id (+ display name and segments from the CBN session exchange) is stored; all times are epoch ms (UTC). -aj
 db.exec(`
 CREATE TABLE IF NOT EXISTS customers (
   customer_id TEXT PRIMARY KEY,
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS checkins (
 );
 CREATE INDEX IF NOT EXISTS checkins_day ON checkins(day);
 CREATE INDEX IF NOT EXISTS checkins_customer_time ON checkins(customer_id, claimed_at);
--- Mirror of published Strapi events (src/cms.js replaces it on every sync); id = Strapi id.
+-- Mirror of published Strapi events (src/cms.js replaces it on every sync); id = Strapi id. -aj
 CREATE TABLE IF NOT EXISTS events (
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL,

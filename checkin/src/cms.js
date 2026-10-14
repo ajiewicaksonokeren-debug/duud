@@ -1,7 +1,7 @@
 import { db } from './db.js';
 
 // Strapi owns content (feature switch, texts, images, events). Points and login stay here.
-// Published entries are mirrored into SQLite so claims never wait on Strapi and survive a Strapi outage.
+// Published entries are mirrored into SQLite so claims never wait on Strapi and survive a Strapi outage. -aj
 const STRAPI_URL = (process.env.STRAPI_URL || '').replace(/\/$/, '');
 const TTL = 5 * 60e3;
 
@@ -19,7 +19,7 @@ const saveSetting = (key, v) =>
 export const getConfig = () => ({ ...DEFAULT_CONFIG, ...setting('cms_config') });
 export const cmsStatus = () => ({ source: STRAPI_URL || null, syncedAt: syncedAt || null, error: lastError, warnings });
 
-// Strapi v5 returns flat entries, v4 nests them under `attributes`; media likewise.
+// Strapi v5 returns flat entries, v4 nests them under `attributes`; media likewise. -aj
 const flat = (e) => (e ? { id: e.id, ...(e.attributes ?? e) } : null);
 const media = (m) => {
   const url = m?.url ?? m?.data?.attributes?.url ?? m?.data?.url ?? '';
@@ -32,7 +32,7 @@ async function get(path) {
     headers: process.env.STRAPI_TOKEN ? { authorization: `Bearer ${process.env.STRAPI_TOKEN}` } : {},
     signal: AbortSignal.timeout(5000),
   });
-  if (res.status === 404) return { data: null }; // single type not created/published yet
+  if (res.status === 404) return { data: null }; // single type not created/published yet -aj
   if (!res.ok) throw new Error(`Strapi ${path.split('?')[0]} → HTTP ${res.status}`);
   return res.json();
 }
@@ -74,7 +74,7 @@ export async function sync() {
       items.push(...body.data.map(flat));
       pages = body.meta?.pagination?.pageCount ?? 1;
     }
-    // Max 1 event per type at a time: the earlier start wins, the clash is reported in the admin.
+    // Max 1 event per type at a time: the earlier start wins, the clash is reported in the admin. -aj
     const w = [];
     const kept = [];
     for (const { ev, bad } of items.map(toEvent).sort((a, b) => a.ev.start_at - b.ev.start_at)) {
@@ -98,7 +98,7 @@ export async function sync() {
     syncedAt = Date.now();
     nextSync = syncedAt + TTL;
   } catch (e) {
-    lastError = e.message; // keep serving the last good mirror, retry in 30 s
+    lastError = e.message; // keep serving the last good mirror, retry in 30 s -aj
     nextSync = Date.now() + 30e3;
     console.error('Strapi sync failed:', e.message);
   }

@@ -2,7 +2,7 @@ import { db } from './db.js';
 import { getConfig } from './cms.js';
 import { DEFAULT_RULES, dayPoints, eventBonus, eventTag, levelAt, nextLevel, multiplier } from '../public/points.js';
 
-// Indonesia has no DST, so WIB is a fixed UTC+7 offset.
+// Indonesia has no DST, so WIB is a fixed UTC+7 offset. -aj
 const WIB = 7 * 3600e3;
 export const wibDay = (ms) => new Date(ms + WIB).toISOString().slice(0, 10);
 export const wibHms = (ms) => new Date(ms + WIB).toISOString().slice(11, 19);
@@ -17,13 +17,13 @@ export function saveRules(r) {
   db.prepare("INSERT INTO settings (key, value) VALUES ('rules', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").run(JSON.stringify(r));
 }
 
-// Leaderboards show "Dian A." to other customers; full names stay in the admin.
+// Leaderboards show "Dian A." to other customers; full names stay in the admin. -aj
 export const maskName = (name) => {
   const w = String(name || '').trim().split(/\s+/).filter(Boolean);
   return w.length ? (w.length > 1 ? `${w[0]} ${w[w.length - 1][0]}.` : w[0]) : 'Pelanggan';
 };
 
-// Called on session exchange: name + segments come from the CBN backend, never from the browser.
+// Called on session exchange: name + segments come from the CBN backend, never from the browser. -aj
 export function touchCustomer(id, name, segments, now) {
   db.prepare(
     `INSERT INTO customers (customer_id, name, segments, created_at) VALUES (?, ?, ?, ?)
@@ -33,7 +33,7 @@ export function touchCustomer(id, name, segments, now) {
 
 const getCustomer = (id) => db.prepare('SELECT * FROM customers WHERE customer_id = ?').get(id);
 
-// Events overlapping [from, to) that target this customer (no segments = everyone).
+// Events overlapping [from, to) that target this customer (no segments = everyone). -aj
 function activeEvents(c, from, to = from + 1) {
   const mine = JSON.parse(c.segments);
   return db
@@ -53,7 +53,7 @@ function totals(id, now, r) {
     .get(since.getTime(), id);
 }
 
-// Points for a claim made at `now` on streak day `s`.
+// Points for a claim made at `now` on streak day `s`. -aj
 function quote(r, c, s, levelPct, paid, now) {
   const p = dayPoints(r, s, levelPct, paid);
   const hms = wibHms(now);
@@ -102,15 +102,15 @@ export function state(id, now) {
   const today = wibDay(now);
   const claimed = c.last_day === today;
   const alive = claimed || c.last_day === addDays(today, -1);
-  const streak = alive ? c.streak : 0; // current streak, 0 once broken
-  const todayS = claimed ? c.streak : streak + 1; // streak day of today's check-in
+  const streak = alive ? c.streak : 0; // current streak, 0 once broken -aj
+  const todayS = claimed ? c.streak : streak + 1; // streak day of today's check-in -aj
   const paid = JSON.parse(c.milestones);
   const { lifetime, balance } = totals(id, now, r);
   const todayRow = claimed ? db.prepare('SELECT * FROM checkins WHERE customer_id = ? AND day = ?').get(id, today) : null;
   const lv = levelAt(r, lifetime - (todayRow?.total || 0));
   const q = claimed ? rowQuote(todayRow) : quote(r, c, todayS, lv.pct, paid, now);
 
-  // 7-day cycle: H(todayS - cycleDay + 1) .. +6. Past days are done; future days show projected points.
+  // 7-day cycle: H(todayS - cycleDay + 1) .. +6. Past days are done; future days show projected points. -aj
   const cycleDay = ((todayS - 1) % 7) + 1;
   const week = Array.from({ length: 7 }, (_, i) => {
     const s = todayS - cycleDay + i + 1;
@@ -173,7 +173,7 @@ export function leaderboard(mode, id, now) {
   const r = getRules();
   const today = wibDay(now);
   const month = today.slice(0, 7);
-  // Ties: whoever reached the value first (earlier last check-in, to the second) ranks higher.
+  // Ties: whoever reached the value first (earlier last check-in, to the second) ranks higher. -aj
   const sql =
     mode === 'streak'
       ? `SELECT customer_id, name, streak val, last_claimed_at last, ROW_NUMBER() OVER (ORDER BY streak DESC, last_claimed_at) r

@@ -1,4 +1,4 @@
-// Pure point rules. Shared by the server (src/engine.js) and the admin simulator (admin.html).
+// Pure point rules. Shared by the server (src/engine.js) and the admin simulator (admin.html). -aj
 export const DEFAULT_RULES = {
   base: 10,
   cycle: 50,
@@ -14,12 +14,12 @@ export const DEFAULT_RULES = {
   board: { size: 10 },
 };
 
-// tiers and levels are kept sorted ascending by the server
+// tiers and levels are kept sorted ascending by the server -aj
 export const multiplier = (r, streak) => r.tiers.reduce((m, t) => (streak >= t.from ? t.m : m), 1);
 export const levelAt = (r, lifetime) => r.levels.reduce((a, l) => (lifetime >= l.min ? l : a), r.levels[0]);
 export const nextLevel = (r, lifetime) => r.levels.find((l) => l.min > lifetime) || null;
 
-// streak = the streak day being claimed (1-based). Milestones pay once per customer, ever.
+// streak = the streak day being claimed (1-based). Milestones pay once per customer, ever. -aj
 export function dayPoints(r, streak, levelPct, paidMilestones = []) {
   const m = multiplier(r, streak);
   const base = Math.round(r.base * m);
@@ -30,7 +30,7 @@ export function dayPoints(r, streak, levelPct, paidMilestones = []) {
 }
 
 // hms = claim time 'HH:MM:SS' WIB; count = customer's check-ins inside the event period incl. this one.
-// Multiplier only multiplies base + level bonus, never cycle/milestone bonuses.
+// Multiplier only multiplies base + level bonus, never cycle/milestone bonuses. -aj
 export function eventBonus(ev, p, hms, count) {
   if (ev.type === 'multiplier') return Math.round((p.base + p.lb) * (ev.value - 1));
   if (ev.type === 'time_window') return hms >= ev.window_start && hms < ev.window_end ? ev.value : 0;
